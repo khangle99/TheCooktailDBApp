@@ -9,6 +9,7 @@ import androidx.databinding.BindingAdapter
 import coil.ImageLoader
 import coil.load
 import coil.request.ImageRequest
+import coil.size.Scale
 import coil.transform.RoundedCornersTransformation
 import com.khangle.thecocktaildbapp.R
 
@@ -16,11 +17,11 @@ import com.khangle.thecocktaildbapp.R
 fun setImageUrl(view: ImageView, strUrl: String?) {
     strUrl?.let {
         view.load(strUrl) {
-            //  crossfade(true)
-            crossfade(500)
-            placeholder(R.drawable.ic_launcher_background)
+            crossfade(true)
+            placeholder(R.drawable.ic_app)
                 .error(R.drawable.ic_broken_image)
                 .transformations(RoundedCornersTransformation(20f))
+                .scale(Scale.FILL)
         }
     }
 }

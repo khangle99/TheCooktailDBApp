@@ -45,6 +45,9 @@
                 android:gravity="start" />
 
             <include
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 layout="@layout/drink_compat"
                 android:id="@+id/compatDrink"
                 app:drink="@{drink}" />

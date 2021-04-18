@@ -14,6 +14,7 @@
         tools:context=".search.SearchFragment">
 
         <TextView
+
             android:layout_margin="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,7 +37,7 @@
 
         <ViewStub
             android:id="@+id/error_stub"
-            android:inflatedId="@+id/panel_error"
+            android:inflatedId="@+id/error_stub"
             android:layout="@layout/error"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -44,11 +45,18 @@
 
         <ViewStub
             android:id="@+id/not_found_stub"
-            android:inflatedId="@+id/panel_not_found"
+            android:inflatedId="@+id/not_found_stub"
             android:layout="@layout/not_found"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom" />
+        <ViewStub
+            android:id="@+id/search_progress"
+            android:inflatedId="@+id/search_progress_inflated"
+            android:layout="@layout/loading_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
         <ImageView
             android:layout_margin="10dp"

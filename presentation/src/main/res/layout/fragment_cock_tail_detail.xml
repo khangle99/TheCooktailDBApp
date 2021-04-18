@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="drink"
+            type="com.khangle.domain.model.Drink" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".cocktailDetail.CockTailDetailFragment">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{drink.name}"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                tools:text="Name"
+                android:gravity="center" />
+
+            <ImageView
+                app:image_url="@{drink.thumbUrl}"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="300dp"
+                android:layout_height="300dp" />
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:flexWrap="wrap"
+                app:justifyContent="center">
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:backgroundTint="@color/teal_200"
+                    android:layout_height="wrap_content"
+                    android:text="@{drink.category}" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/purple_200"
+                    android:text="@{drink.alcoholic}" />
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <TextView
+                android:text="Instruction"
+                android:textSize="20sp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="@{drink.instructions}"
+                android:layout_width="match_parent"
+                android:layout_margin="10dp"
+                android:textSize="18sp"
+                tools:text="Sample"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="Ingredients"
+                android:textSize="20sp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ingredientRecycleView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </ScrollView>
+</layout>

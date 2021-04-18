@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".search.SearchFragment">
+
+        <TextView
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search Cocktail"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical" />
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search Cocktail by name" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchResultRecycleView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ViewStub
+            android:id="@+id/error_stub"
+            android:inflatedId="@+id/panel_error"
+            android:layout="@layout/error"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom" />
+
+        <ViewStub
+            android:id="@+id/not_found_stub"
+            android:inflatedId="@+id/panel_not_found"
+            android:layout="@layout/not_found"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom" />
+
+        <ImageView
+            android:layout_margin="10dp"
+            android:id="@+id/findViewImg"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:src="@mipmap/cocktails"/>
+        <TextView
+            android:id="@+id/findViewText"
+            android:text="Find Your Drink"
+            android:textSize="30sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
+    </LinearLayout>
+</layout>

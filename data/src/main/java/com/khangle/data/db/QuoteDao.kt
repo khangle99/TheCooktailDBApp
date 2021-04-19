@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QuoteDao {
-    suspend fun insertAllWithTimestamp(vararg drink: Quote) {
-        val varargList = drink.map {
+    suspend fun insertAllWithTimestamp(vararg quote: Quote) {
+        val varargList = quote.map {
             it.apply {
                 createdAt = System.currentTimeMillis()
             }

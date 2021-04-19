@@ -19,10 +19,10 @@ class GoQuoteRepositoryImp @Inject constructor(
         val flow = networkBoundResource(
             query = { quoteDao.getAll() },
             fetch = { goQuoteBaseApi.fetchRandomQuote().quotes[0] },
-            saveFetchResult = { drink ->
+            saveFetchResult = { quote ->
                 quoteDatabase.withTransaction {
                     quoteDao.deleteAll()
-                    quoteDao.insertAllWithTimestamp(drink)
+                    quoteDao.insertAllWithTimestamp(quote)
                 }
             },
             shouldFetch = {

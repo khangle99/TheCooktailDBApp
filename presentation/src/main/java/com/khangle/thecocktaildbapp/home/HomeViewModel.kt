@@ -25,14 +25,21 @@ class HomeViewModel @Inject constructor(
     val randomDrink: LiveData<Drink> = _randomDrink
     private val _randomQuote = MutableLiveData<Quote>()
     val randomQuote: LiveData<Quote> = _randomQuote
+    private val _loadComplete = MutableLiveData<Boolean>()
+    val loadComplete: LiveData<Boolean> = _loadComplete
+    var refreshFlag = true
     fun refresh() {
-        viewModelScope.launch(Dispatchers.IO) {
-       //     val drinkById = async { theCockTailDBRepository.getDrinkById("11007") }
-            val quote = async { randomQuoteUseCase() }
-            val drink = async { randomDrinkUseCase() }
-            _randomDrink.postValue(drink.await())
-            _randomQuote.postValue(quote.await())
+        if (refreshFlag) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val quote = async { randomQuoteUseCase() }
+                val drink = async { randomDrinkUseCase() }
+                _randomDrink.postValue(drink.await())
+                _randomQuote.postValue(quote.await())
+                _loadComplete.postValue(true)
+                refreshFlag = !refreshFlag
+            }
         }
+
     }
 
 

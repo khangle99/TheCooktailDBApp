@@ -31,15 +31,21 @@ class CategoryViewModel @Inject constructor(
     fun selecteCategory(position: Int) {
         _selectedCategory.value = _categoryList.value?.data?.get(position)?.strCategory
     }
+
+    // avoid reloading when configuration change
+    var fetchCategoryFlag = true // user will change to true in future
     fun fetchCategoryList() {
-        viewModelScope.launch(Dispatchers.IO) {
-           try {
-               _categoryList.postValue(Resource.Loading())
-               val categoryList = fetchCategoryListUseCase()
-               _categoryList.postValue(Resource.Success(data = categoryList))
-           } catch (e: Exception) {
-               _categoryList.postValue(Resource.Error(e.message!!))
-           }
+        if (fetchCategoryFlag) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    _categoryList.postValue(Resource.Loading())
+                    val categoryList = fetchCategoryListUseCase()
+                    _categoryList.postValue(Resource.Success(data = categoryList))
+                } catch (e: Exception) {
+                    _categoryList.postValue(Resource.Error(e.message!!))
+                }
+            }
+            fetchCategoryFlag = false
         }
     }
 

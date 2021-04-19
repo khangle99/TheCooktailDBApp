@@ -16,6 +16,7 @@
         <ImageView
             android:id="@+id/thumbItem"
             android:layout_gravity="center_horizontal"
+            android:transitionName="thumb"
             app:image_url="@{drink.thumbUrl}"
             android:layout_width="200dp"
             android:layout_height="200dp"/>

@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionInflater
 import com.khangle.domain.model.Drink
+import com.khangle.domain.model.Resource
 import com.khangle.thecocktaildbapp.R
 import com.khangle.thecocktaildbapp.databinding.FragmentCockTailDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,7 +43,10 @@ class CockTailDetailFragment : Fragment() {
     ): View {
         binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_cock_tail_detail, container, false)
-        ViewCompat.setTransitionName(binding.thumbImageView, requireArguments().getString("shareViewId"))
+        ViewCompat.setTransitionName(
+            binding.thumbImageView,
+            requireArguments().getString("shareViewId")
+        )
         binding.ingredientRecycleView.isNestedScrollingEnabled = false
         return binding.root
     }
@@ -50,20 +54,32 @@ class CockTailDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         postponeEnterTransition()
+
         adapter = IngredientAdapter(listOf(), listOf())
         binding.ingredientRecycleView.adapter = adapter
         binding.ingredientRecycleView.layoutManager = LinearLayoutManager(requireContext())
         cockTailDetailViewModel.drink.observe(viewLifecycleOwner, Observer {
-            binding.drink = it
-            adapter.setData(it.ingredients, it.ingredientsMeasure)
-            binding.executePendingBindings()
+            when (it) {
+                is Resource.Loading -> {
+
+                }
+                is Resource.Success -> {
+
+                    binding.drink = it.data
+                    adapter.setData(
+                        it.data?.ingredients ?: emptyList(),
+                        it.data?.ingredientsMeasure ?: emptyList()
+                    )
+                    binding.executePendingBindings()
+                    (view.parent as? ViewGroup)?.doOnPreDraw {
+                        startPostponedEnterTransition()
+                    }
+                }
+                is Resource.Error -> {
+
+                }
+            }
         })
-
-        (view.parent as? ViewGroup)?.doOnPreDraw {
-            startPostponedEnterTransition()
-        }
-
-
     }
 
 

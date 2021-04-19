@@ -34,8 +34,8 @@ class IngredientAdapter(private var ingredients: List<String>, private var ingre
 
 class IngredientViewHolder(private val binding: ItemIngredientBinding): RecyclerView.ViewHolder(binding.root) {
     fun bind(ingredient: String,measure: String) {
-        binding.ingredient = ingredient
-        binding.measure = measure
+        binding.ingredientStr = ingredient
+        binding.measureStr = measure
     }
 companion object {
     fun create(parent: ViewGroup): IngredientViewHolder {

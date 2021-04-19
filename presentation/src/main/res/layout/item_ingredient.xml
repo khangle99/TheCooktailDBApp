@@ -5,10 +5,10 @@
 
     <data>
         <variable
-            name="ingredient"
+            name="ingredientStr"
             type="String" />
         <variable
-            name="measure"
+            name="measureStr"
             type="String" />
     </data>
 
@@ -19,35 +19,50 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:padding="20dp"
             android:layout_height="wrap_content">
 
             <ImageView
+                android:id="@+id/arrow_img"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_next"/>
+                android:src="@drawable/ic_next"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ingredient"
+                app:layout_constraintTop_toTopOf="parent"/>
+
             <TextView
-                android:layout_marginLeft="10dp"
+                android:id="@+id/ingredient"
+                android:layout_width="187dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:text="@{ingredientStr}"
+                android:breakStrategy="simple"
                 android:textSize="18sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Sample"
-                android:text="@{ingredient}"/>
+                app:layout_constraintEnd_toStartOf="@id/measure"
+                app:layout_constraintStart_toEndOf="@id/arrow_img"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Sample " />
+
             <TextView
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
+                android:id="@+id/measure"
+                android:layout_width="63dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:breakStrategy="simple"
+                android:text="@{measureStr}"
                 android:textSize="18sp"
                 android:textStyle="italic"
-                tools:text="Sample"
-                android:text="@{measure}"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/ingredient"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Sample " />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
 </layout>

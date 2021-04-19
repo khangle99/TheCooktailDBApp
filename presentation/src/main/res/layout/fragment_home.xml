@@ -29,7 +29,6 @@
                 android:layout_height="wrap_content"
                 android:textSize="30sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"
                 android:text="Home"
                 android:layout_margin="10dp"
                 android:gravity="start" />
@@ -39,17 +38,17 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:drawableStart="@drawable/ic_search"
-                android:text="Drink of the day "
+                android:drawableStart="@drawable/ic_drink_suggest"
+                android:text="Suggested Drink"
                 android:layout_margin="10dp"
-                android:gravity="start" />
+                android:gravity="center_vertical" />
 
             <include
+                android:id="@+id/compatDrink"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 layout="@layout/drink_compat"
-                android:id="@+id/compatDrink"
                 app:drink="@{drink}" />
             
             <Button

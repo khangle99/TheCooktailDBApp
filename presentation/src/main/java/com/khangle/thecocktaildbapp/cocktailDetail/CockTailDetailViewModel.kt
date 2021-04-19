@@ -14,23 +14,27 @@ import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-class CockTailDetailViewModel @Inject constructor(private val fetchDrinkByIdUseCase: FetchDrinkByIdUseCase): ViewModel() {
-     private val _drink = MutableLiveData<Resource<Drink>>()
-     var drink: LiveData<Resource<Drink>> = _drink
-     fun getDrink(drinkId: String) {
-          viewModelScope.launch(Dispatchers.IO) {
-               try {
+class CockTailDetailViewModel @Inject constructor(private val fetchDrinkByIdUseCase: FetchDrinkByIdUseCase) :
+    ViewModel() {
+    private val _drink = MutableLiveData<Resource<Drink>>()
+    var drink: LiveData<Resource<Drink>> = _drink
+    private var isLoaded = false
+    fun fetchDrink(drinkId: String) {
+        if (!isLoaded) {
+            isLoaded = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
                     _drink.postValue(Resource.Loading())
                     val drink = fetchDrinkByIdUseCase(drinkId)
                     _drink.postValue(Resource.Success(data = drink))
-               } catch (e: Exception) {
-                    _drink.postValue(Resource.Error(e.message!!))
-               }
-          }
+                } catch (e: Exception) {
+                    _drink.postValue(Resource.Error(e))
+                }
+            }
+        }
+    }
 
-     }
-
-     fun setDrink(drink: Drink) {
-          _drink.value = Resource.Success(data = drink)
-     }
+    fun setDrink(drink: Drink) {
+        _drink.value = Resource.Success(data = drink)
+    }
 }

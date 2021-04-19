@@ -1,16 +1,14 @@
 package com.khangle.domain.repository
 
-import com.khangle.domain.model.Alcoholic
-import com.khangle.domain.model.Category
-import com.khangle.domain.model.Drink
-import com.khangle.domain.model.FilterResultDrink
+import com.khangle.domain.model.*
+import kotlinx.coroutines.flow.Flow
 
 interface TheCockTailDBRepository {
-    suspend fun getRandomDrink(): Drink
-    suspend fun getDrinkById(id: String): Drink
+    fun getRandomDrink(forceRefresh: Boolean): Flow<Resource<List<Drink>>>
+    suspend fun fetchDrinkById(id: String): Drink
     suspend fun query(str: String): List<Drink>
-    suspend fun getAlcoholicList(): List<Alcoholic>
-    suspend fun getCategoryList(): List<Category>
-    suspend fun getDrinkByCategory(categoryStr: String): List<FilterResultDrink>
-    suspend fun getDrinkByAlcoholic(alcoholicStr: String): List<FilterResultDrink>
+    suspend fun fetchAlcoholicList(): List<Alcoholic>
+    suspend fun fetchCategoryList(): List<Category>
+    suspend fun fetchDrinkByCategory(categoryStr: String): List<FilterResultDrink>
+    suspend fun fetchDrinkByAlcoholic(alcoholicStr: String): List<FilterResultDrink>
 }

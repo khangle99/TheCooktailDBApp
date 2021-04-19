@@ -1,8 +1,11 @@
 package com.khangle.thecocktaildbapp.di
 
 import android.content.Context
+import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.khangle.data.db.CockTailDatabase
+import com.khangle.data.db.QuoteDatabase
 import com.khangle.data.repository.GoQuoteRepositoryImp
 import com.khangle.data.repository.TheCocktailDBRepositoryImp
 import com.khangle.data.webservice.GoQuoteApi
@@ -39,7 +42,6 @@ object ApplicationProvideModule {
         ).create()
     }
 
-
     @Provides
     @Singleton
     fun provideClient(@ApplicationContext context: Context): OkHttpClient {
@@ -73,14 +75,28 @@ object ApplicationProvideModule {
             .build()
             .create(GoQuoteApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideCocktailDB(@ApplicationContext context: Context) : CockTailDatabase =
+        Room.databaseBuilder(context, CockTailDatabase::class.java, "cocktail_database")
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideQuoteDB(@ApplicationContext context: Context) : QuoteDatabase =
+        Room.databaseBuilder(context, QuoteDatabase::class.java, "quote_database")
+            .build()
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ApplicationBindModule {
     @Binds
+    @Singleton
     abstract fun bindTheCocktailDBRepository(theCocktailDBRepositoryImp: TheCocktailDBRepositoryImp): TheCockTailDBRepository
 
     @Binds
+    @Singleton
     abstract fun bindGoQuoteRepository(quoteRepository: GoQuoteRepositoryImp): GoQuoteRepository
 }

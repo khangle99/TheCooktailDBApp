@@ -10,6 +10,6 @@ interface FetchCategoryListUseCase {
 }
 class FetchCategoryListUseCaseImp @Inject constructor (private val theCockTailDBRepository: TheCockTailDBRepository): FetchCategoryListUseCase {
     override suspend fun invoke(): List<Category> {
-        return theCockTailDBRepository.getCategoryList()
+        return theCockTailDBRepository.fetchCategoryList()
     }
 }

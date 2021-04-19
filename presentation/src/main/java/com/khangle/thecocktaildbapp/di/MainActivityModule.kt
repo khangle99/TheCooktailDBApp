@@ -8,8 +8,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ActivityRetainedComponent
 
-@Module
-@InstallIn(ActivityRetainedComponent::class)
-abstract class MainActivityBindModule {
-
-}
+//@Module
+//@InstallIn(ActivityRetainedComponent::class)
+//abstract class MainActivityBindModule {
+//
+//}

@@ -30,32 +30,15 @@ class AlcoholicFilterFragment : Fragment() {
     private lateinit var adapter: DrinkListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        alcoholicViewModel.fetchCategoryList()
-        adapter = DrinkListAdapter { drink, shareView ->
-            parentFragmentManager.commit {
-                setReorderingAllowed(true)
-                val fragmentDetail = CockTailDetailFragment()
-                fragmentDetail.arguments = bundleOf(
-                    "isRequest" to true,
-                    "id" to drink.id,
-                    "shareViewId" to ViewCompat.getTransitionName(shareView)
-                ) // request
-                addSharedElement(shareView, ViewCompat.getTransitionName(shareView)!!)
-                addToBackStack(null)
-                replace(R.id.hostFragment, fragmentDetail)
-            }
-            if (binding.alcoholicProgress.isInflated) {
-                binding.alcoholicProgress.root.isVisible = true
-            } else {
-                binding.alcoholicProgress.viewStub?.isVisible = true
-            }
-        }
+        alcoholicViewModel.fetchAlcoholicList()
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_alcoholic_filter,container,false)
+    ): View {
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_alcoholic_filter, container, false)
         return binding.root
     }
 
@@ -65,16 +48,19 @@ class AlcoholicFilterFragment : Fragment() {
         (view.parent as? ViewGroup)?.doOnPreDraw {
             startPostponedEnterTransition()
         }
-        alcoholicViewModel.selectedCategory.observe(viewLifecycleOwner, Observer {
-            alcoholicViewModel.fetchDrinkByAlcoholic(it)
-        })
-        binding.drinkRecycleView.adapter = adapter
-        binding.drinkRecycleView.layoutManager = LinearLayoutManager(requireContext())
         binding.dropdownview.onSelectionListener =
             OnDropDownSelectionListener { dropDownView, position ->
-                alcoholicViewModel.selecteAlcoholic(position)
+                alcoholicViewModel.selectedAlcoholic(position)
             }
-        alcoholicViewModel.category.observe(viewLifecycleOwner, Observer {
+        initAdapter()
+        observeLiveData()
+    }
+
+    private fun observeLiveData() {
+        alcoholicViewModel.selectedAlcoholic.observe(viewLifecycleOwner, Observer {
+            alcoholicViewModel.fetchDrinkByAlcoholic(it)
+        })
+        alcoholicViewModel.alcoholicList.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Resource.Success -> {
                     binding.dropdownview.dropDownItemList =
@@ -83,7 +69,8 @@ class AlcoholicFilterFragment : Fragment() {
                     binding.dropdownview.isVisible = true
                 }
                 is Resource.Loading -> {
-                    binding.alcoholicProgress.viewStub?.isVisible = true // dont need to check inflate
+                    binding.alcoholicProgress.viewStub?.isVisible =
+                        true // dont need to check inflate
                     binding.dropdownview.isVisible = false
                 }
                 is Resource.Error -> {
@@ -106,7 +93,7 @@ class AlcoholicFilterFragment : Fragment() {
                 }
                 is Resource.Success -> {
                     // bind to adapter
-                    adapter.submitList(it.data?.map {  filterDrink ->
+                    adapter.submitList(it.data?.map { filterDrink ->
                         Drink().apply {
                             name = filterDrink.name
                             id = filterDrink.id
@@ -118,6 +105,30 @@ class AlcoholicFilterFragment : Fragment() {
                 }
             }
         })
+    }
+
+    private fun initAdapter() {
+        adapter = DrinkListAdapter { drink, shareView ->
+            parentFragmentManager.commit {
+                setReorderingAllowed(true)
+                val fragmentDetail = CockTailDetailFragment()
+                fragmentDetail.arguments = bundleOf(
+                    "isRequest" to true,
+                    "id" to drink.id,
+                    "shareViewId" to ViewCompat.getTransitionName(shareView)
+                ) // request
+                addSharedElement(shareView, ViewCompat.getTransitionName(shareView)!!)
+                addToBackStack(null)
+                replace(R.id.hostFragment, fragmentDetail)
+            }
+            if (binding.alcoholicProgress.isInflated) {
+                binding.alcoholicProgress.root.isVisible = true
+            } else {
+                binding.alcoholicProgress.viewStub?.isVisible = true
+            }
+        }
+        binding.drinkRecycleView.adapter = adapter
+        binding.drinkRecycleView.layoutManager = LinearLayoutManager(requireContext())
     }
 
 

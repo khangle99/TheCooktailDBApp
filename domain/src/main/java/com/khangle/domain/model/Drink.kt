@@ -1,6 +1,9 @@
 package com.khangle.domain.model
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.TypeAdapter
 import com.google.gson.annotations.SerializedName
 import com.google.gson.stream.JsonReader
@@ -8,17 +11,19 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import kotlinx.parcelize.Parcelize
 
+@Entity
 @Parcelize
 class Drink(
-    var id: String = "",
+    @PrimaryKey var id: String = "",
     var name: String = "",
     var category: String = "",
     var alcoholic: String = "",
     var instructions: String = "",
     var thumbUrl: String = "",
+    @ColumnInfo(name = "created_at") var createdAt: Long = 0,
     val ingredients: MutableList<String> = mutableListOf(),
     val ingredientsMeasure: MutableList<String> = mutableListOf()
-): Parcelable
+) : Parcelable
 
 class DrinkTypeAdapter : TypeAdapter<Drink>() {
     override fun write(out: JsonWriter?, value: Drink?) {
@@ -53,7 +58,7 @@ class DrinkTypeAdapter : TypeAdapter<Drink>() {
                     fieldname == "strDrinkThumb" -> {
                         drink.thumbUrl = reader.nextString()
                     }
-                    fieldname.startsWith("strIngredient")  -> {
+                    fieldname.startsWith("strIngredient") -> {
                         token = reader.peek()
                         if (token != JsonToken.NULL) {
                             drink.ingredients.add(reader.nextString())
@@ -70,7 +75,7 @@ class DrinkTypeAdapter : TypeAdapter<Drink>() {
                             reader.skipValue()
                         }
                     }
-                    else ->  reader.skipValue()
+                    else -> reader.skipValue()
                 }
 
             }

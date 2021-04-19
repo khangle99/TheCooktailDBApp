@@ -9,7 +9,7 @@ interface FetchDrinkByIdUseCase {
 }
 class FetchDrinkByIdUseCaseImp @Inject constructor(private val theCockTailDBRepository: TheCockTailDBRepository): FetchDrinkByIdUseCase {
     override suspend fun invoke(id: String): Drink {
-        return theCockTailDBRepository.getDrinkById(id)
+        return theCockTailDBRepository.fetchDrinkById(id)
     }
 
 }

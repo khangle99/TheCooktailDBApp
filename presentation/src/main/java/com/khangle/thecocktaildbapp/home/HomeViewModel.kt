@@ -1,46 +1,46 @@
 package com.khangle.thecocktaildbapp.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.khangle.domain.model.Drink
 import com.khangle.domain.model.Quote
+import com.khangle.domain.model.Resource
 import com.khangle.domain.repository.TheCockTailDBRepository
 import com.khangle.domain.usecase.GetRandomDrinkUseCase
 import com.khangle.domain.usecase.GetRandomQuoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Suppress("DeferredResultUnused")
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val randomDrinkUseCase: GetRandomDrinkUseCase,
-    private val randomQuoteUseCase: GetRandomQuoteUseCase,
-    private val theCockTailDBRepository: TheCockTailDBRepository
+    private val randomQuoteUseCase: GetRandomQuoteUseCase
 ) : ViewModel() {
-    private val _randomDrink = MutableLiveData<Drink>()
-    val randomDrink: LiveData<Drink> = _randomDrink
-    private val _randomQuote = MutableLiveData<Quote>()
-    val randomQuote: LiveData<Quote> = _randomQuote
-    private val _loadComplete = MutableLiveData<Boolean>()
-    val loadComplete: LiveData<Boolean> = _loadComplete
-    var refreshFlag = true
-    fun refresh() {
-        if (refreshFlag) {
+    private val _randomDrink = MutableLiveData<Resource<List<Drink>>>()
+    val randomDrink: LiveData<Resource<List<Drink>>> = _randomDrink
+    private val _randomQuote = MutableLiveData<Resource<List<Quote>>>()
+    val randomQuote: LiveData<Resource<List<Quote>>> = _randomQuote
+
+    var refreshFlag = true // avoid configuration change
+    fun refresh(forceRefresh: Boolean = false) {
+        if (refreshFlag || forceRefresh) {
             viewModelScope.launch(Dispatchers.IO) {
-                val quote = async { randomQuoteUseCase() }
-                val drink = async { randomDrinkUseCase() }
-                _randomDrink.postValue(drink.await())
-                _randomQuote.postValue(quote.await())
-                _loadComplete.postValue(true)
-                refreshFlag = !refreshFlag
+                async {
+                    randomDrinkUseCase(forceRefresh).collect {
+                        _randomDrink.postValue(it)
+                    }
+                }
+                async {
+                    randomQuoteUseCase(forceRefresh).collect {
+                        _randomQuote.postValue(it)
+                    }
+                }
+                refreshFlag = false
             }
         }
-
     }
-
-
 }

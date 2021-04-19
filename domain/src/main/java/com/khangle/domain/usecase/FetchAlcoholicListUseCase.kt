@@ -9,6 +9,6 @@ interface FetchAlcoholicListUseCase {
 }
 class FetchAlcoholicListUseCaseImp @Inject constructor(private val theCockTailDBRepository: TheCockTailDBRepository): FetchAlcoholicListUseCase {
     override suspend fun invoke(): List<Alcoholic> {
-        return theCockTailDBRepository.getAlcoholicList()
+        return theCockTailDBRepository.fetchAlcoholicList()
     }
 }

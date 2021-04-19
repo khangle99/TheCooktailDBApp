@@ -31,6 +31,36 @@ class CategoryFilterFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         categoryViewModel.fetchCategoryList()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_category_filter, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        (view.parent as? ViewGroup)?.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
+        initAdapter()
+        observeLiveData()
+        setEvent()
+    }
+
+    private fun setEvent() {
+        binding.dropdownview.onSelectionListener =
+            OnDropDownSelectionListener { dropDownView, position ->
+                categoryViewModel.selecteCategory(position)
+            }
+    }
+
+    private fun initAdapter() {
         adapter = DrinkListAdapter { drink, shareView ->
             parentFragmentManager.commit {
                 setReorderingAllowed(true)
@@ -50,34 +80,15 @@ class CategoryFilterFragment : Fragment() {
                 binding.categoryProgressBar.viewStub?.isVisible = true
             }
         }
-
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_category_filter, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        postponeEnterTransition()
-        (view.parent as? ViewGroup)?.doOnPreDraw {
-            startPostponedEnterTransition()
-        }
-        categoryViewModel.selectedCategory.observe(viewLifecycleOwner, Observer {
-            categoryViewModel.fetchDrinkByCategory(it)
-        })
         binding.drinkRecycleView.adapter = adapter
         binding.drinkRecycleView.layoutManager = LinearLayoutManager(requireContext())
-        binding.dropdownview.onSelectionListener =
-            OnDropDownSelectionListener { dropDownView, position ->
-                categoryViewModel.selecteCategory(position)
-            }
-        categoryViewModel.category.observe(viewLifecycleOwner, Observer {
+    }
+
+    private fun observeLiveData() {
+        categoryViewModel.selectedCategory.observe(viewLifecycleOwner, {
+            categoryViewModel.fetchDrinkByCategory(it)
+        })
+        categoryViewModel.category.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Success -> {
                     binding.dropdownview.dropDownItemList =
@@ -98,7 +109,7 @@ class CategoryFilterFragment : Fragment() {
             }
         })
 
-        categoryViewModel.drinks.observe(viewLifecycleOwner, Observer {
+        categoryViewModel.drinks.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Loading -> {
                     binding.categoryProgressBar.root?.isVisible =
@@ -118,10 +129,8 @@ class CategoryFilterFragment : Fragment() {
                         }
                     })
                     binding.categoryProgressBar.root?.isVisible = false
-
                 }
             }
         })
     }
-
 }

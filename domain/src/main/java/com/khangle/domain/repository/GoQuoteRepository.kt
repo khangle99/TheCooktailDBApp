@@ -1,7 +1,10 @@
 package com.khangle.domain.repository
 
+import com.khangle.domain.model.Drink
 import com.khangle.domain.model.Quote
+import com.khangle.domain.model.Resource
+import kotlinx.coroutines.flow.Flow
 
 interface GoQuoteRepository {
-    suspend fun getRandomQuote(): Quote
+    fun getRandomQuote(forceRefresh: Boolean): Flow<Resource<List<Quote>>>
 }

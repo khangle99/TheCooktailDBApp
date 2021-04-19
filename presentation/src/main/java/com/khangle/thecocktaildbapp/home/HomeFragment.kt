@@ -15,6 +15,7 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import com.khangle.domain.model.Resource
 import com.khangle.thecocktaildbapp.R
 import com.khangle.thecocktaildbapp.alcoholic.AlcoholicFilterFragment
 import com.khangle.thecocktaildbapp.category.CategoryFilterFragment
@@ -35,25 +36,10 @@ class HomeFragment : Fragment() {
         homeViewModel.refresh()
     }
 
-    private fun setSlashy() {
-        Splashy(requireActivity())
-            .setLogo(R.drawable.ic_app)
-            .setTitle("Cocktail")
-            .setTitleSize(30.0f)
-            .setTitleColor("#FFFFFF")
-            .setSubTitle("The Cocktail DB App")
-            .setProgressColor(R.color.white)
-            .setAnimation(Splashy.Animation.SLIDE_IN_TOP_BOTTOM,500)
-            .setFullScreen(true)
-            .setDuration(2000)
-            .show()
-    }
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         return binding.root
     }
@@ -61,20 +47,14 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         postponeEnterTransition()
+        setEvent()
+        observeLiveData()
+    }
 
-        homeViewModel.randomDrink.observe(viewLifecycleOwner, Observer {
-            binding.drink = it
-            binding.executePendingBindings()
-            (view.parent as? ViewGroup)?.doOnPreDraw {
-                startPostponedEnterTransition()
-            }
-        })
-
-        homeViewModel.randomQuote.observe(viewLifecycleOwner, Observer {
-            binding.quote = it
-            binding.executePendingBindings()
-        })
-
+    private fun setEvent() {
+        binding.swiperefresh.setOnRefreshListener {
+            homeViewModel.refresh(forceRefresh = true)
+        }
         binding.categoryNavigate.setOnClickListener {
             parentFragmentManager.commitAnimate {
                 setReorderingAllowed(true)
@@ -101,13 +81,12 @@ class HomeFragment : Fragment() {
             parentFragmentManager.commit {
                 setReorderingAllowed(true)
                 val fragmentDetail = CockTailDetailFragment()
-
+                val drink = homeViewModel.randomDrink.value?.data?.get(0)
                 fragmentDetail.arguments = bundleOf(
                     "isRequest" to false,
-                    "drink" to homeViewModel.randomDrink.value,
+                    "drink" to drink,
                     "shareViewId" to "thumb"
                 )
-                ViewCompat.setTransitionName(binding.compatDrink.thumbItem, "thumb")
                 addSharedElement(binding.compatDrink.thumbItem, "thumb")
                 addToBackStack(null)
                 replace(R.id.hostFragment, fragmentDetail)
@@ -115,5 +94,53 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun observeLiveData() {
+        homeViewModel.randomDrink.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Resource.Success -> {
+                    binding.drink = it.data?.get(0)
+                    binding.executePendingBindings()
+                }
+                is Resource.Loading -> {
+                }
+                is Resource.Error -> {
+                }
+            }
+            binding.swiperefresh.isRefreshing = false // turn off after done
+            (requireView().parent as? ViewGroup)?.doOnPreDraw {
+                startPostponedEnterTransition()
+            }
+        })
 
+        homeViewModel.randomQuote.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is Resource.Success -> {
+                    binding.quote = it.data?.get(0)
+                    binding.executePendingBindings()
+                }
+                is Resource.Loading -> {
+                }
+                is Resource.Error -> {
+                }
+            }
+            binding.executePendingBindings()
+        })
+    }
+
+    private fun setSlashy() {
+        Splashy(requireActivity())
+            .setLogo(R.drawable.ic_app)
+            .setTitle("Cocktail")
+            .setTitleSize(30.0f)
+            .setTitleColor("#FFFFFF")
+            .setBackgroundColor(R.color.backgroundSplash)
+            .setSubTitle("The Cocktail DB App")
+            .setSubTitleColor(R.color.textOnSplash)
+            .setSubTitleItalic(true)
+            .setProgressColor(R.color.white)
+            .setAnimation(Splashy.Animation.SLIDE_IN_TOP_BOTTOM, 1000)
+            .setFullScreen(true)
+            .setDuration(2000)
+            .show()
+    }
 }

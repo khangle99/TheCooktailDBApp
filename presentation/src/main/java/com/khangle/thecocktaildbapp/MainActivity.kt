@@ -25,9 +25,4 @@ class MainActivity : AppCompatActivity() {
             replace(R.id.hostFragment, HomeFragment())
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-
-    }
 }

@@ -28,12 +28,13 @@ class CategoryViewModel @Inject constructor(
     val drinks: LiveData<Resource<List<FilterResultDrink>>> = _drinks
     private val _selectedCategory = MutableLiveData<String>()
     val selectedCategory: LiveData<String> = _selectedCategory
+
     fun selecteCategory(position: Int) {
         _selectedCategory.value = _categoryList.value?.data?.get(position)?.strCategory
     }
 
     // avoid reloading when configuration change
-    var fetchCategoryFlag = true // user will change to true in future
+    var fetchCategoryFlag = true // user will change to true in future if need
     fun fetchCategoryList() {
         if (fetchCategoryFlag) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -42,7 +43,7 @@ class CategoryViewModel @Inject constructor(
                     val categoryList = fetchCategoryListUseCase()
                     _categoryList.postValue(Resource.Success(data = categoryList))
                 } catch (e: Exception) {
-                    _categoryList.postValue(Resource.Error(e.message!!))
+                    _categoryList.postValue(Resource.Error(e))
                 }
             }
             fetchCategoryFlag = false
@@ -56,7 +57,7 @@ class CategoryViewModel @Inject constructor(
                val drinks = fetchDrinkByCategoryUseCase(categoryStr)
                _drinks.postValue(Resource.Success(data = drinks))
            } catch (e: Exception) {
-               _drinks.postValue(Resource.Error(e.message!!))
+               _drinks.postValue(Resource.Error(e))
            }
         }
     }

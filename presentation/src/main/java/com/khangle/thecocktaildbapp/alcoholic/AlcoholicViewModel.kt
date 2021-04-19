@@ -22,29 +22,29 @@ class AlcoholicViewModel @Inject constructor(
     private val fetchDrinkByAlcoholicUseCase: FetchDrinkByAlcoholicUseCase
 ): ViewModel() {
     private val _alcoholicList = MutableLiveData<Resource<List<Alcoholic>>>()
-    val category: LiveData<Resource<List<Alcoholic>>> = _alcoholicList
+    val alcoholicList: LiveData<Resource<List<Alcoholic>>> = _alcoholicList
     private val _drinks = MutableLiveData<Resource<List<FilterResultDrink>>>()
     val drinks: LiveData<Resource<List<FilterResultDrink>>> = _drinks
-    private val _selectedCategory = MutableLiveData<String>()
-    val selectedCategory: LiveData<String> = _selectedCategory
-    fun selecteAlcoholic(position: Int) {
-        _selectedCategory.value = _alcoholicList.value?.data?.get(position)?.strAlcoholic
+    private val _selectedAlcoholic = MutableLiveData<String>()
+    val selectedAlcoholic: LiveData<String> = _selectedAlcoholic
+    fun selectedAlcoholic(position: Int) {
+        _selectedAlcoholic.value = _alcoholicList.value?.data?.get(position)?.strAlcoholic
     }
 
     // avoid reloading when configuration change
-    var fetchCategoryFlag = true // user will change to true in future
-    fun fetchCategoryList() {
-        if (fetchCategoryFlag) {
+    var fetchALcoholicFlag = true // user will change to true in future
+    fun fetchAlcoholicList() {
+        if (fetchALcoholicFlag) {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     _alcoholicList.postValue(Resource.Loading())
                     val alcoholicList = fetchAlcoholicListUseCase()
                     _alcoholicList.postValue(Resource.Success(data = alcoholicList))
                 } catch (e: Exception) {
-                    _alcoholicList.postValue(Resource.Error(e.message!!))
+                    _alcoholicList.postValue(Resource.Error(e))
                 }
             }
-            fetchCategoryFlag = false
+            fetchALcoholicFlag = false
         }
     }
 
@@ -55,7 +55,7 @@ class AlcoholicViewModel @Inject constructor(
                 val drinks = fetchDrinkByAlcoholicUseCase(alcoholicStr)
                 _drinks.postValue(Resource.Success(data = drinks))
             } catch (e: Exception) {
-                _drinks.postValue(Resource.Error(e.message!!))
+                _drinks.postValue(Resource.Error(e))
             }
         }
     }

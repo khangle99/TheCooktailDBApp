@@ -12,7 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionInflater
-import com.khangle.domain.model.Drink
 import com.khangle.domain.model.Resource
 import com.khangle.thecocktaildbapp.R
 import com.khangle.thecocktaildbapp.databinding.FragmentCockTailDetailBinding
@@ -25,16 +24,9 @@ class CockTailDetailFragment : Fragment() {
     private lateinit var adapter: IngredientAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         sharedElementEnterTransition = TransitionInflater.from(requireContext())
             .inflateTransition(R.transition.shared_image)
-
-        val isRequest = requireArguments().getBoolean("isRequest", true)
-        if (!isRequest) {
-            cockTailDetailViewModel.setDrink(requireArguments().getParcelable("drink")!!)
-        } else {
-            cockTailDetailViewModel.getDrink(requireArguments().getString("id")!!)
-        }
+        loadData()
     }
 
     override fun onCreateView(
@@ -47,18 +39,35 @@ class CockTailDetailFragment : Fragment() {
             binding.thumbImageView,
             requireArguments().getString("shareViewId")
         )
-        binding.ingredientRecycleView.isNestedScrollingEnabled = false
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         postponeEnterTransition()
+        setUpRecycleView()
+        observeLiveData()
+    }
 
+    private fun loadData() {
+        val isRequest = requireArguments().getBoolean("isRequest", true)
+        if (!isRequest) {
+            cockTailDetailViewModel.setDrink(requireArguments().getParcelable("drink")!!)
+        } else {
+            cockTailDetailViewModel.fetchDrink(requireArguments().getString("id")!!)
+        }
+    }
+
+    private fun setUpRecycleView() {
         adapter = IngredientAdapter(listOf(), listOf())
+        binding.ingredientRecycleView.isNestedScrollingEnabled = false
         binding.ingredientRecycleView.adapter = adapter
         binding.ingredientRecycleView.layoutManager = LinearLayoutManager(requireContext())
-        cockTailDetailViewModel.drink.observe(viewLifecycleOwner, Observer {
+    }
+
+    private fun observeLiveData() {
+        cockTailDetailViewModel.drink.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Loading -> {
 
@@ -71,7 +80,7 @@ class CockTailDetailFragment : Fragment() {
                         it.data?.ingredientsMeasure ?: emptyList()
                     )
                     binding.executePendingBindings()
-                    (view.parent as? ViewGroup)?.doOnPreDraw {
+                    (requireView().parent as? ViewGroup)?.doOnPreDraw {
                         startPostponedEnterTransition()
                     }
                 }

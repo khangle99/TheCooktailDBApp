@@ -10,6 +10,6 @@ interface FetchDrinkByCategoryUseCase {
 
 class FetchDrinkByCategoryUseCaseImp @Inject constructor(private val theCockTailDBRepository: TheCockTailDBRepository): FetchDrinkByCategoryUseCase {
     override suspend fun invoke(categoryStr: String): List<FilterResultDrink> {
-        return theCockTailDBRepository.getDrinkByCategory(categoryStr)
+        return theCockTailDBRepository.fetchDrinkByCategory(categoryStr)
     }
 }

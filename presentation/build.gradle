@@ -99,6 +99,7 @@ dependencies {
     testImplementation 'androidx.test:runner:1.3.0'
     testImplementation 'androidx.test:rules:1.3.0'
     testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3"
     // instrumental
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

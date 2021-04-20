@@ -8,6 +8,7 @@ import com.khangle.domain.model.Quote
 import com.khangle.domain.model.Resource
 import com.khangle.domain.repository.GoQuoteRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GoQuoteRepositoryImp @Inject constructor(
@@ -18,7 +19,9 @@ class GoQuoteRepositoryImp @Inject constructor(
         val quoteDao = quoteDatabase.quoteDao()
         val flow = networkBoundResource(
             query = { quoteDao.getAll() },
-            fetch = { goQuoteBaseApi.fetchRandomQuote().quotes[0] },
+            fetch = {
+                goQuoteBaseApi.fetchRandomQuote().quotes[0]
+            },
             saveFetchResult = { quote ->
                 quoteDatabase.withTransaction {
                     quoteDao.deleteAll()

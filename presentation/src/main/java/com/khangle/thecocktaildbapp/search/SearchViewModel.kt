@@ -27,16 +27,16 @@ class SearchViewModel @Inject constructor(private val searchDrinkByNameUseCase: 
         }
     }
 
-
     private var isCollected = false // flag check
     private suspend fun setupCollectIfNot() {
         if (!isCollected) {
             isCollected = true
             try {
                 _drinks.postValue(Resource.Loading())
-                stateFlow.flatMapLatest {
+                val a = stateFlow.flatMapLatest {
                     query(it)
-                }.collect {
+                }
+                a.collect {
                     if (it != null) { // null when no result match
                         _drinks.postValue(Resource.Success(data = it))
                     } else {

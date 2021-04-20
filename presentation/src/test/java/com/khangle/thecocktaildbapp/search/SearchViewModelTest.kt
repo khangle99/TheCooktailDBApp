@@ -1,18 +1,22 @@
 package com.khangle.thecocktaildbapp.search
 
-import com.google.common.truth.Truth
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
+import com.google.common.truth.Truth.assertThat
 import com.khangle.domain.model.Drink
-import com.khangle.domain.repository.TheCockTailDBRepository
+import com.khangle.domain.model.Resource
 import com.khangle.domain.usecase.SearchDrinkByNameUseCase
-import com.khangle.domain.usecase.SearchDrinkByNameUseCaseImp
+import com.khangle.thecocktaildbapp.util.TestCoroutineRule
 import com.khangle.thecocktaildbapp.util.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class SearchViewModelTest {
@@ -21,6 +25,15 @@ class SearchViewModelTest {
     @MockK
     lateinit var searchDrinkByNameUseCase: SearchDrinkByNameUseCase
 
+    @MockK
+    lateinit var drinkObserver: Observer<Resource<List<Drink>>>
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    @get:Rule
+    val testInstantTaskExecutorRule = InstantTaskExecutorRule()
+
     @Before
     fun setup() {
         MockKAnnotations.init(this)
@@ -28,13 +41,21 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun test_invoke() = runBlocking {
-        val drink = Drink("","","")
-        val drinkList = listOf(drink)
-        coEvery { searchDrinkByNameUseCase.invoke("query") } returns  drinkList
-       objectUnderTest!!.queryStr("query")
-        coVerify {  searchDrinkByNameUseCase.invoke("query") }
-        Truth.assertThat(objectUnderTest!!.drinks.getOrAwaitValue(5).data).isSameInstanceAs(drinkList)
+    fun test_query() = runBlocking {
+        testCoroutineRule.runBlockingTest {
+            //given
+            val drink = Drink()
+            val drinkList = listOf(drink)
+            objectUnderTest!!.drinks.observeForever(drinkObserver)
+            every { drinkObserver.onChanged(any()) } answers {}
+            coEvery { searchDrinkByNameUseCase("query") } returns drinkList
+            //when
+            objectUnderTest!!.queryStr("query")
+            //then
+            coVerify { searchDrinkByNameUseCase("query") }
+            assertThat(objectUnderTest!!.drinks.getOrAwaitValue().data).isSameInstanceAs(drinkList)
+            objectUnderTest!!.drinks.removeObserver(drinkObserver)
+        }
     }
 
     @After

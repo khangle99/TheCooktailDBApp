@@ -31,9 +31,12 @@ class GetRandomDrinkUseCaseTest {
     }
     @Test
     fun test_getRandomQuote_returnFlow() {
+        //given
         val sampleFlow = flow<Resource<List<Drink>>> {  emit(Resource.Success(data = emptyList())) }
         every { cocktailRepository.getRandomDrink(true) } returns sampleFlow
+        //when
         val flow: Flow<Resource<List<Drink>>> = objectUnderTest!!.invoke(true)
+        //then
         verify { cocktailRepository.getRandomDrink(true) }
         Truth.assertThat(flow).isSameInstanceAs(sampleFlow)
     }

@@ -31,10 +31,13 @@ class SearchDrinkByNameUseCaseTest {
 
     @Test
     fun test_invoke() = runBlocking {
+        //given
         val drink = Drink("","","")
         val drinkList = listOf(drink)
         coEvery { theCockTailDBRepository.query("query") } returns  drinkList
+        //when
         val result: List<Drink> = objectUnderTest!!.invoke("query")
+        //then
         coVerify {  theCockTailDBRepository.query("query") }
         Truth.assertThat(result).isSameInstanceAs(drinkList)
     }

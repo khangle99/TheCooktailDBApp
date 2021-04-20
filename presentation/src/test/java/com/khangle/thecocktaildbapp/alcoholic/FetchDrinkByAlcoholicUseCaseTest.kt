@@ -29,10 +29,13 @@ class FetchDrinkByAlcoholicUseCaseTest {
     
     @Test
     fun test_invoke() = runBlocking {
+        //given
         val drink = FilterResultDrink("","","")
         val drinkList = listOf(drink)
         coEvery { theCockTailDBRepository.fetchDrinkByAlcoholic("alcoholic") } returns  drinkList
+        //when
         val result: List<FilterResultDrink> = objectUnderTest!!.invoke("alcoholic")
+        //then
         coVerify {  theCockTailDBRepository.fetchDrinkByAlcoholic("alcoholic") }
         assertThat(result).isSameInstanceAs(drinkList)
     }

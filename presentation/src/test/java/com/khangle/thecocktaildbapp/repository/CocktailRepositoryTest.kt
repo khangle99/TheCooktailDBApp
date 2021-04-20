@@ -28,60 +28,78 @@ class CocktailRepositoryTest {
     }
     @Test
     fun test_fetchDrinkById_returnDrink() = runBlocking {
+        //given
         val drink = Drink()
         val response = DrinkDetailResponse(drinks = listOf(drink))
         coEvery { theCockTailDBBaseApi.fetchDrinkById("id") } returns response
+        //when
         val drinkAns: Drink = objectUnderTest!!.fetchDrinkById("id")
+        //then
         coVerify { theCockTailDBBaseApi.fetchDrinkById("id") }
         assertThat(drinkAns).isSameInstanceAs(drink)
     }
 
     @Test
     fun test_query_returnListDrink() = runBlocking {
+        //given
         val drink = Drink()
         val response = DrinkDetailResponse(drinks = listOf(drink))
         coEvery { theCockTailDBBaseApi.search("id") } returns response
+        //when
         val query: List<Drink> = objectUnderTest!!.query("id")
+        //then
         coVerify { theCockTailDBBaseApi.search("id") }
         assertThat(query).isSameInstanceAs(response.drinks)
     }
 
     @Test
     fun test_fetchAlcoholicList_returnAlcoholicList() = runBlocking {
+        //given
         val alcoholic = Alcoholic("")
         val response = AlcoholicListResponse(drinks = listOf(alcoholic))
         coEvery { theCockTailDBBaseApi.fetchAlcoholicList() } returns response
+        //when
         val alcoholicList = objectUnderTest!!.fetchAlcoholicList()
+        //then
         coVerify { theCockTailDBBaseApi.fetchAlcoholicList() }
         assertThat(alcoholicList).isSameInstanceAs(response.drinks)
     }
 
     @Test
     fun test_fetchCategoryList_returnCategoryList() = runBlocking {
+        //given
         val alcoholic = Category("")
         val response = CategoryListResponse(drinks = listOf(alcoholic))
         coEvery { theCockTailDBBaseApi.fetchCategoryList() } returns response
+        //when
         val categoryList = objectUnderTest!!.fetchCategoryList()
+        //then
         coVerify { theCockTailDBBaseApi.fetchCategoryList() }
         assertThat(categoryList).isSameInstanceAs(response.drinks)
     }
 
     @Test
     fun test_fetchDrinkByCategory_returnFilterDrinkList() = runBlocking{
+        //given
         val filterResultDrink = FilterResultDrink("","","")
         val response = FilterResultResponse(drinks = listOf(filterResultDrink))
         coEvery { theCockTailDBBaseApi.fetchDrinksByCategory("category") } returns  response
+        //when
         val listResult: List<FilterResultDrink> = objectUnderTest!!.fetchDrinkByCategory("category")
+        //then
         coVerify { theCockTailDBBaseApi.fetchDrinksByCategory("category") }
         assertThat(listResult).isSameInstanceAs(response.drinks)
     }
 
     @Test
     fun test_fetchDrinkByAlcoholic_returnFilterDrinkList() = runBlocking {
+        //given
         val filterResultDrink = FilterResultDrink("","","")
         val response = FilterResultResponse(drinks = listOf(filterResultDrink))
         coEvery { theCockTailDBBaseApi.fetchDrinksByAlcoholic("alcoholic") } returns  response
+        //when
         val listResult: List<FilterResultDrink> = objectUnderTest!!.fetchDrinkByAlcoholic("alcoholic")
+        //then
         coVerify { theCockTailDBBaseApi.fetchDrinksByAlcoholic("alcoholic") }
         assertThat(listResult).isSameInstanceAs(response.drinks)
     }

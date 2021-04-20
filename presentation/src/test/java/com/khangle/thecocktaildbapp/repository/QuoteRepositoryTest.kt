@@ -20,115 +20,115 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class QuoteRepositoryTest {
-
-    var objectUnderTest: GoQuoteRepository? = null
-
-    @MockK
-    lateinit var quoteDatabase: QuoteDatabase
-
-    @MockK
-    lateinit var goQuoteBaseApi: GoQuoteBaseApi
-
-    @MockK
-    lateinit var quoteDao: QuoteDao
-
-    @Before
-    fun setup() {
-        MockKAnnotations.init(this)
-        objectUnderTest = GoQuoteRepositoryImp(goQuoteBaseApi, quoteDatabase)
-    }
-
-    @Test
-    fun test_getRandomQuote_force() = runBlocking {
-        val quoteAPI = Quote(author = "", text = "")
-        val listQuoteAPI = listOf(quoteAPI)
-        val quoteDB = Quote(author = "", text = "")
-        val listQuoteDB = listOf(quoteDB)
-        coEvery { quoteDao.getAll() } returns flow { emit(listQuoteDB) }
-//        coEvery { quoteDao.deleteAll() }
-//        coEvery { quoteDao.insertAllWithTimestamp(quote) }
-//                coEvery {
-//            quoteDatabase.withTransaction {
-//                coJustRun {
-//                    any()
-//                }
-//            }
+//class QuoteRepositoryTest {
+//
+//    var objectUnderTest: GoQuoteRepository? = null
+//
+//    @MockK
+//    lateinit var quoteDatabase: QuoteDatabase
+//
+//    @MockK
+//    lateinit var goQuoteBaseApi: GoQuoteBaseApi
+//
+//    @MockK
+//    lateinit var quoteDao: QuoteDao
+//
+//    @Before
+//    fun setup() {
+//        MockKAnnotations.init(this)
+//        objectUnderTest = GoQuoteRepositoryImp(goQuoteBaseApi, quoteDatabase)
+//    }
+//
+//    @Test
+//    fun test_getRandomQuote_force() = runBlocking {
+//        val quoteAPI = Quote(author = "", text = "")
+//        val listQuoteAPI = listOf(quoteAPI)
+//        val quoteDB = Quote(author = "", text = "")
+//        val listQuoteDB = listOf(quoteDB)
+//        coEvery { quoteDao.getAll() } returns flow { emit(listQuoteDB) }
+////        coEvery { quoteDao.deleteAll() }
+////        coEvery { quoteDao.insertAllWithTimestamp(quote) }
+////                coEvery {
+////            quoteDatabase.withTransaction {
+////                coJustRun {
+////                    any()
+////                }
+////            }
+////        }
+//        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
+//        every { quoteDatabase.quoteDao() } returns quoteDao
+//
+//
+//        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(true)
+//        flow.collect {
+//          assertThat(it.data).isSameInstanceAs(listQuoteAPI)
 //        }
-        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
-        every { quoteDatabase.quoteDao() } returns quoteDao
-
-
-        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(true)
-        flow.collect {
-          assertThat(it.data).isSameInstanceAs(listQuoteAPI)
-        }
-
-        //       coVerify { quoteDao.deleteAll() }
-        //       coVerify { quoteDao.insertAllWithTimestamp(quote) }
-        verify { quoteDatabase.quoteDao() }
-        coVerify { quoteDao.getAll() }
-        coVerify { goQuoteBaseApi.fetchRandomQuote() }
-    }
-
-
-    @Test
-    fun test_getRandomQuote_not_force_timeOut() = runBlocking {
-        val quoteAPI = Quote(author = "", text = "")
-        val listQuoteAPI = listOf(quoteAPI)
-        val quoteDB = Quote(author = "", text = "", createdAt = System.currentTimeMillis() - 60*60*1000*2)
-        val listQuoteDB = listOf(quoteDB)
-        coEvery { quoteDao.getAll() } returns flow { emit(listQuoteDB) }
-        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
-        every { quoteDatabase.quoteDao() } returns quoteDao
-
-
-        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(false)
-        flow.collect {
-            assertThat(it.data).isSameInstanceAs(listQuoteDB)
-        }
-        verify { quoteDatabase.quoteDao() }
-        coVerify { quoteDao.getAll() }
-        coVerify { goQuoteBaseApi.fetchRandomQuote() }
-    }
-    @Test
-    fun test_getRandomQuote_not_force_not_TimeOut() = runBlocking {
-        val quoteAPI = Quote(author = "", text = "")
-        val listQuoteAPI = listOf(quoteAPI)
-        val quoteDB = Quote(author = "", text = "", createdAt = System.currentTimeMillis()) // not time out
-        val listQuoteDB = listOf(quoteDB)
-        coEvery { quoteDao.getAll() } returns flow { emit(listQuoteDB) }
-        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
-        every { quoteDatabase.quoteDao() } returns quoteDao
-
-        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(false)
-        flow.collect {
-            assertThat(it.data).isSameInstanceAs(listQuoteDB)
-        }
-        verify { quoteDatabase.quoteDao() }
-        coVerify { quoteDao.getAll() }
-    }
-
-    @Test
-    fun test_getRandomQuote_empty_db()= runBlocking {
-        val quoteAPI = Quote(author = "", text = "")
-        val listQuoteAPI = listOf(quoteAPI)
-        coEvery { quoteDao.getAll() } returns flow { emit(emptyList<Quote>()) }
-        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
-        every { quoteDatabase.quoteDao() } returns quoteDao
-
-        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(false)
-        flow.collect {
-            assertThat(it.data).isSameInstanceAs(listQuoteAPI)
-        }
-        verify { quoteDatabase.quoteDao() }
-        coVerify { quoteDao.getAll() }
-        coVerify { goQuoteBaseApi.fetchRandomQuote() }
-    }
-
-
-    @After()
-    fun teardown() {
-        objectUnderTest = null
-    }
-}
+//
+//        //       coVerify { quoteDao.deleteAll() }
+//        //       coVerify { quoteDao.insertAllWithTimestamp(quote) }
+//        verify { quoteDatabase.quoteDao() }
+//        coVerify { quoteDao.getAll() }
+//        coVerify { goQuoteBaseApi.fetchRandomQuote() }
+//    }
+//
+//
+//    @Test
+//    fun test_getRandomQuote_not_force_timeOut() = runBlocking {
+//        val quoteAPI = Quote(author = "", text = "")
+//        val listQuoteAPI = listOf(quoteAPI)
+//        val quoteDB = Quote(author = "", text = "", createdAt = System.currentTimeMillis() - 60*60*1000*2)
+//        val listQuoteDB = listOf(quoteDB)
+//        coEvery { quoteDao.getAll() } returns flow { emit(listQuoteDB) }
+//        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
+//        every { quoteDatabase.quoteDao() } returns quoteDao
+//
+//
+//        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(false)
+//        flow.collect {
+//            assertThat(it.data).isSameInstanceAs(listQuoteDB)
+//        }
+//        verify { quoteDatabase.quoteDao() }
+//        coVerify { quoteDao.getAll() }
+//        coVerify { goQuoteBaseApi.fetchRandomQuote() }
+//    }
+//    @Test
+//    fun test_getRandomQuote_not_force_not_TimeOut() = runBlocking {
+//        val quoteAPI = Quote(author = "", text = "")
+//        val listQuoteAPI = listOf(quoteAPI)
+//        val quoteDB = Quote(author = "", text = "", createdAt = System.currentTimeMillis()) // not time out
+//        val listQuoteDB = listOf(quoteDB)
+//        coEvery { quoteDao.getAll() } returns flow { emit(listQuoteDB) }
+//        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
+//        every { quoteDatabase.quoteDao() } returns quoteDao
+//
+//        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(false)
+//        flow.collect {
+//            assertThat(it.data).isSameInstanceAs(listQuoteDB)
+//        }
+//        verify { quoteDatabase.quoteDao() }
+//        coVerify { quoteDao.getAll() }
+//    }
+//
+//    @Test
+//    fun test_getRandomQuote_empty_db()= runBlocking {
+//        val quoteAPI = Quote(author = "", text = "")
+//        val listQuoteAPI = listOf(quoteAPI)
+//        coEvery { quoteDao.getAll() } returns flow { emit(emptyList<Quote>()) }
+//        coEvery { goQuoteBaseApi.fetchRandomQuote() } returns QuoteResponse(quotes = listQuoteAPI)
+//        every { quoteDatabase.quoteDao() } returns quoteDao
+//
+//        val flow: Flow<Resource<List<Quote>>> =   objectUnderTest!!.getRandomQuote(false)
+//        flow.collect {
+//            assertThat(it.data).isSameInstanceAs(listQuoteAPI)
+//        }
+//        verify { quoteDatabase.quoteDao() }
+//        coVerify { quoteDao.getAll() }
+//        coVerify { goQuoteBaseApi.fetchRandomQuote() }
+//    }
+//
+//
+//    @After()
+//    fun teardown() {
+//        objectUnderTest = null
+//    }
+//}

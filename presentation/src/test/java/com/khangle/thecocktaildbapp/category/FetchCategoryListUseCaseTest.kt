@@ -30,10 +30,13 @@ class FetchCategoryListUseCaseTest {
 
     @Test
     fun test_invoke() = runBlocking {
+        //given
         val category = Category("")
         val categoryList = listOf(category)
         coEvery { theCockTailDBRepository.fetchCategoryList() } returns categoryList
+        //when
         val result = objectUnderTest!!.invoke()
+        //then
         coVerify { theCockTailDBRepository.fetchCategoryList()  }
         Truth.assertThat(result).isSameInstanceAs(categoryList)
     }

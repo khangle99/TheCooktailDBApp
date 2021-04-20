@@ -30,9 +30,12 @@ class GetRandomQuoteUseCaseTest {
     }
     @Test
     fun test_getRandomQuote_returnFlow() {
+        //given
         val sampleFlow = flow<Resource<List<Quote>>> {  emit(Resource.Success(data = emptyList())) }
         every { quoteRepository.getRandomQuote(true) } returns sampleFlow
+        //when
         val flow: Flow<Resource<List<Quote>>> = objectUnderTest!!.invoke(true)
+        //then
         verify { quoteRepository.getRandomQuote(true) }
         Truth.assertThat(flow).isSameInstanceAs(sampleFlow)
     }

@@ -27,7 +27,7 @@ class FetchAlcoholicListUseCaseTest {
     }
 
     @Test
-    fun test_invoke() = runBlocking {
+    fun test_fetchAlcoholicList_returnAlcoholicList() = runBlocking {
         //given
         val alcoholic = Alcoholic("")
         val alcoholicList = listOf(alcoholic)

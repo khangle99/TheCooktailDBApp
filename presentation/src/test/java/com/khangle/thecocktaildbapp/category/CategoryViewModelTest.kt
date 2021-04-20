@@ -51,7 +51,7 @@ class CategoryViewModelTest {
     }
 
     @Test
-    fun test_fetchCategoryList() = runBlocking {
+    fun test_fetchCategoryList_returnCategoryList() = runBlocking {
         testCoroutineRule.runBlockingTest {
             //given
            val category = Category("")
@@ -69,7 +69,7 @@ class CategoryViewModelTest {
     }
 
     @Test
-    fun test_fetchDrinkByCategory() {
+    fun test_fetchDrinkByCategory_returnFilterDrinkList() {
         testCoroutineRule.runBlockingTest {
             //given
             val drink = FilterResultDrink("","","")

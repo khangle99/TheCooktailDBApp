@@ -27,10 +27,9 @@ class GetRandomDrinkUseCaseTest {
     fun setup() {
         MockKAnnotations.init(this)
         objectUnderTest = GetRandomDrinkUseCaseImp(cocktailRepository)
-
     }
     @Test
-    fun test_getRandomQuote_returnFlow() {
+    fun test_getRandomDrink_returnDrinkFlow() {
         //given
         val sampleFlow = flow<Resource<List<Drink>>> {  emit(Resource.Success(data = emptyList())) }
         every { cocktailRepository.getRandomDrink(true) } returns sampleFlow

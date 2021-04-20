@@ -28,7 +28,7 @@ class FetchDrinkByAlcoholicUseCaseTest {
     }
     
     @Test
-    fun test_invoke() = runBlocking {
+    fun test_fetchDrinkByAlcoholic_returnFilterDrinkList() = runBlocking {
         //given
         val drink = FilterResultDrink("","","")
         val drinkList = listOf(drink)

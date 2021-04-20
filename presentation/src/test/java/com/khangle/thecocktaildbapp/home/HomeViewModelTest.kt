@@ -41,10 +41,8 @@ class HomeViewModelTest {
 
     @Before
     fun setup() {
-
         MockKAnnotations.init(this)
         objectUnderTest = HomeViewModel(randomDrinkUseCase, randomQuoteUseCase)
-
     }
 
     @Test
@@ -68,8 +66,6 @@ class HomeViewModelTest {
             //then
             verify { randomDrinkUseCase(true) }
             verify { randomQuoteUseCase(true) }
-            verify { drinkObserver.onChanged(any()) }
-            verify { quoteObserver.onChanged(any()) }
             assertThat(objectUnderTest!!.randomDrink.getOrAwaitValue(5)).isSameInstanceAs(drinkSuccess)
             assertThat(objectUnderTest!!.randomQuote.getOrAwaitValue(5)).isSameInstanceAs(quoteSuccess)
             objectUnderTest!!.randomDrink.removeObserver(drinkObserver)
@@ -98,8 +94,6 @@ class HomeViewModelTest {
             //then
             verify { randomDrinkUseCase(false) }
             verify { randomQuoteUseCase(false) }
-            verify { drinkObserver.onChanged(any()) }
-            verify { quoteObserver.onChanged(any()) }
             assertThat(objectUnderTest!!.randomDrink.getOrAwaitValue(5)).isSameInstanceAs(drinkSuccess)
             assertThat(objectUnderTest!!.randomQuote.getOrAwaitValue(5)).isSameInstanceAs(quoteSuccess)
             objectUnderTest!!.randomDrink.removeObserver(drinkObserver)

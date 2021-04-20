@@ -29,7 +29,7 @@ class FetchDrinkByCategoryUseCaseTest {
     }
 
     @Test
-    fun test_invoke() = runBlocking {
+    fun test_fetchDrinkByCategory_returnFilterDrinkList() = runBlocking {
         //given
         val drink = FilterResultDrink("","","")
         val drinkList = listOf(drink)

@@ -26,10 +26,9 @@ class GetRandomQuoteUseCaseTest {
     fun setup() {
         MockKAnnotations.init(this)
         objectUnderTest = GetRandomQuoteUseCaseImp(quoteRepository)
-
     }
     @Test
-    fun test_getRandomQuote_returnFlow() {
+    fun test_getRandomQuote_returnQuoteFlow() {
         //given
         val sampleFlow = flow<Resource<List<Quote>>> {  emit(Resource.Success(data = emptyList())) }
         every { quoteRepository.getRandomQuote(true) } returns sampleFlow

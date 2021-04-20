@@ -29,7 +29,7 @@ class FetchCategoryListUseCaseTest {
     }
 
     @Test
-    fun test_invoke() = runBlocking {
+    fun test_fetchCategoryList_returnCategoryList() = runBlocking {
         //given
         val category = Category("")
         val categoryList = listOf(category)

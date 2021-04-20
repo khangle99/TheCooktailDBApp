@@ -52,7 +52,7 @@ class AlcoholicViewModelTest {
     }
 
     @Test
-    fun test_fetchAlcoholicList() = runBlocking {
+    fun test_fetchAlcoholicList_returnAlcoholicList() = runBlocking {
         testCoroutineRule.runBlockingTest {
             //given
             val alcoholic = Alcoholic("")
@@ -70,7 +70,7 @@ class AlcoholicViewModelTest {
     }
 
     @Test
-    fun test_fetchDrinkByAlcoholic() {
+    fun test_fetchDrinkByAlcoholic_returnFilterDrinkList() {
         testCoroutineRule.runBlockingTest {
             //given
             val drink = FilterResultDrink("","","")

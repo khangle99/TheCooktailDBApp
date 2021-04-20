@@ -30,7 +30,7 @@ class SearchDrinkByNameUseCaseTest {
     }
 
     @Test
-    fun test_invoke() = runBlocking {
+    fun test_searchDrinkByName_returnDrinkList() = runBlocking {
         //given
         val drink = Drink("","","")
         val drinkList = listOf(drink)

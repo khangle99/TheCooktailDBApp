@@ -40,7 +40,7 @@ class CocktailRepositoryTest {
     }
 
     @Test
-    fun test_query_returnListDrink() = runBlocking {
+    fun test_query_returnDrinkList() = runBlocking {
         //given
         val drink = Drink()
         val response = DrinkDetailResponse(drinks = listOf(drink))
@@ -103,7 +103,6 @@ class CocktailRepositoryTest {
         coVerify { theCockTailDBBaseApi.fetchDrinksByAlcoholic("alcoholic") }
         assertThat(listResult).isSameInstanceAs(response.drinks)
     }
-
 
     @After
     fun teardown() {

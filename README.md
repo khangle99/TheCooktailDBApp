@@ -5,6 +5,7 @@
 -  Clean Architecture
 -  Android Jetpack
 -  Kotlin Coroutine
+-  Unit Test
 
 
 ## Libraries Used
@@ -16,6 +17,10 @@
 - [Lottie-Android](https://github.com/airbnb/lottie-android)
 - [DropDownView](https://github.com/siralam/DropDownView)
 - [Splashy](https://github.com/rahuldange09/Splashy)
+- [JUnit 4](https://github.com/junit-team/junit4)
+- [Mockk](https://github.com/mockk/mockk)
+
+
 
 ## Screenshots
 ![Home](https://github.com/khangle99/TheCooktailDBApp/blob/master/screenshots/home.png)

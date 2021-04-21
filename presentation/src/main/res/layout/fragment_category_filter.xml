@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".category.CategoryFilterFragment">
+        tools:context="com.khangle.thecocktaildbapp.presentation.category.CategoryFilterFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/drinkRecycleView"

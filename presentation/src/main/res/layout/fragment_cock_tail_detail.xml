@@ -7,13 +7,13 @@
 
         <variable
             name="drink"
-            type="com.khangle.domain.model.Drink" />
+            type="com.khangle.thecocktaildbapp.domain.model.Drink" />
     </data>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".cocktailDetail.CockTailDetailFragment">
+        tools:context="com.khangle.thecocktaildbapp.presentation.cocktailDetail.CockTailDetailFragment">
 
         <LinearLayout
             android:orientation="vertical"
@@ -36,7 +36,8 @@
                 app:image_url="@{drink.thumbUrl}"
                 android:layout_gravity="center_horizontal"
                 android:layout_width="300dp"
-                android:layout_height="300dp" />
+                android:layout_height="300dp"
+                tools:ignore="ContentDescription" />
 
             <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
@@ -62,7 +63,7 @@
             </com.google.android.flexbox.FlexboxLayout>
 
             <TextView
-                android:text="Instruction"
+                android:text="@string/instruction"
                 android:textSize="20sp"
                 android:gravity="center_horizontal"
                 android:textColor="@color/black"
@@ -78,7 +79,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:text="Ingredients"
+                android:text="@string/ingredients"
                 android:textSize="20sp"
                 android:gravity="center_horizontal"
                 android:textColor="@color/black"

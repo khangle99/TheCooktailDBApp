@@ -6,20 +6,22 @@
     <data>
         <variable
             name="drink"
-            type="com.khangle.domain.model.Drink" />
+            type="com.khangle.thecocktaildbapp.domain.model.Drink" />
     </data>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        tools:ignore="UseCompoundDrawables">
         <ImageView
             android:id="@+id/thumbItem"
             android:layout_gravity="center_horizontal"
             android:transitionName="thumb"
             app:image_url="@{drink.thumbUrl}"
             android:layout_width="200dp"
-            android:layout_height="200dp"/>
+            android:layout_height="200dp"
+            tools:ignore="ContentDescription" />
         <TextView
             android:layout_gravity="center"
             android:text="@{drink.name}"

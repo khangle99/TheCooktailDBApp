@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
             name="drink"
-            type="com.khangle.domain.model.Drink" />
+            type="com.khangle.thecocktaildbapp.domain.model.Drink" />
 
         <variable
             name="quote"
-            type="com.khangle.domain.model.Quote" />
+            type="com.khangle.thecocktaildbapp.domain.model.Quote" />
     </data>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -23,7 +22,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".home.HomeFragment">
+            tools:context="com.khangle.thecocktaildbapp.presentation.home.HomeFragment">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -35,7 +34,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:gravity="start"
-                    android:text="Home"
+                    android:text="@string/home"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -43,12 +42,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:drawableStart="@drawable/ic_drink_suggest"
                     android:gravity="center_vertical"
-                    android:text="Suggested Drink"
+                    android:text="@string/suggested_drink"
                     android:textColor="@color/black"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:drawableStartCompat="@drawable/ic_drink_suggest" />
 
                 <include
                     android:id="@+id/compatDrink"
@@ -65,9 +64,9 @@
                     android:layout_height="100dp"
                     android:layout_margin="10dp"
                     android:backgroundTint="@color/white"
-                    android:drawableLeft="@drawable/ic_search"
+                    android:drawableStart="@drawable/ic_search"
                     android:elevation="10dp"
-                    android:text="Search Drink"
+                    android:text="@string/search_drink"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     app:cornerRadius="20dp" />
@@ -86,9 +85,9 @@
                         android:layout_margin="10dp"
                         android:layout_weight="1"
                         android:backgroundTint="@color/white"
-                        android:drawableLeft="@drawable/ic_alcoholic"
+                        android:drawableStart="@drawable/ic_alcoholic"
                         android:elevation="10dp"
-                        android:text="Alcoholic"
+                        android:text="@string/alcoholic"
                         android:textColor="@color/black"
                         android:textSize="14sp"
                         app:cornerRadius="20dp" />
@@ -102,9 +101,9 @@
                         android:layout_margin="10dp"
                         android:layout_weight="1"
                         android:backgroundTint="@color/white"
-                        android:drawableLeft="@drawable/ic_category"
+                        android:drawableStart="@drawable/ic_category"
                         android:elevation="10dp"
-                        android:text="Category"
+                        android:text="@string/category"
                         android:textColor="@color/black"
                         android:textSize="14sp"
                         app:cornerRadius="20dp" />
@@ -127,12 +126,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
-                            android:text="Quote"
+                            android:text="@string/quote"
                             android:textSize="30sp" />
 
                         <TextView
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="@{quote.text}"
                             android:textColor="@color/black"

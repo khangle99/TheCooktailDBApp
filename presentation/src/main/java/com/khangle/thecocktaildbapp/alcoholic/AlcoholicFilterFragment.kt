@@ -1,7 +1,6 @@
 package com.khangle.thecocktaildbapp.alcoholic
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +9,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.asksira.dropdownview.OnDropDownSelectionListener
 import com.khangle.domain.model.Drink
@@ -25,7 +24,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class AlcoholicFilterFragment : Fragment() {
-    private lateinit var binding: FragmentAlcoholicFilterBinding
+
+    private var _binding: FragmentAlcoholicFilterBinding? = null
+    private val binding get() = _binding!!
     private val alcoholicViewModel: AlcoholicViewModel by viewModels()
     private lateinit var adapter: DrinkListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +38,9 @@ class AlcoholicFilterFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding =
+        _binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_alcoholic_filter, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -49,7 +51,7 @@ class AlcoholicFilterFragment : Fragment() {
             startPostponedEnterTransition()
         }
         binding.dropdownview.onSelectionListener =
-            OnDropDownSelectionListener { dropDownView, position ->
+            OnDropDownSelectionListener { _, position ->
                 alcoholicViewModel.selectedAlcoholic(position)
             }
         initAdapter()
@@ -57,14 +59,14 @@ class AlcoholicFilterFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        alcoholicViewModel.selectedAlcoholic.observe(viewLifecycleOwner, Observer {
+        alcoholicViewModel.selectedAlcoholic.observe(viewLifecycleOwner, {
             alcoholicViewModel.fetchDrinkByAlcoholic(it)
         })
-        alcoholicViewModel.alcoholicList.observe(viewLifecycleOwner, Observer {
-            when (it) {
+        alcoholicViewModel.alcoholicList.observe(viewLifecycleOwner, { resource ->
+            when (resource) {
                 is Resource.Success -> {
                     binding.dropdownview.dropDownItemList =
-                        it.data?.map { it.strAlcoholic } ?: emptyList()
+                        resource.data?.map { it.strAlcoholic } ?: emptyList()
                     binding.alcoholicProgress.root?.isVisible = false
                     binding.dropdownview.isVisible = true
                 }
@@ -81,7 +83,7 @@ class AlcoholicFilterFragment : Fragment() {
             }
         })
 
-        alcoholicViewModel.drinks.observe(viewLifecycleOwner, Observer {
+        alcoholicViewModel.drinks.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Loading -> {
                     binding.alcoholicProgress.root?.isVisible =
@@ -131,5 +133,8 @@ class AlcoholicFilterFragment : Fragment() {
         binding.drinkRecycleView.layoutManager = LinearLayoutManager(requireContext())
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.khangle.thecocktaildbapp.di
 
 import com.khangle.domain.usecase.GetRandomDrinkUseCase

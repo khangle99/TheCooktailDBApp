@@ -8,21 +8,31 @@ import com.khangle.domain.model.Drink
 import com.khangle.domain.model.Resource
 import com.khangle.domain.usecase.FetchDrinkByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-class CockTailDetailViewModel @Inject constructor(private val fetchDrinkByIdUseCase: FetchDrinkByIdUseCase) :
+class CockTailDetailViewModel constructor(
+    private val dispatcher: CoroutineDispatcher,
+    private val fetchDrinkByIdUseCase: FetchDrinkByIdUseCase
+) :
     ViewModel() {
+    @Inject
+    constructor(fetchDrinkByIdUseCase: FetchDrinkByIdUseCase) : this(
+        Dispatchers.IO,
+        fetchDrinkByIdUseCase
+    )
+
     private val _drink = MutableLiveData<Resource<Drink>>()
     var drink: LiveData<Resource<Drink>> = _drink
     private var isLoaded = false
     fun fetchDrink(drinkId: String) {
         if (!isLoaded) {
             isLoaded = true
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(dispatcher) {
                 try {
                     _drink.postValue(Resource.Loading())
                     val drink = fetchDrinkByIdUseCase(drinkId)

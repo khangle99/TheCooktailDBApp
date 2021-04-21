@@ -2,16 +2,14 @@ package com.khangle.thecocktaildbapp.home
 
 import com.google.common.truth.Truth
 import com.khangle.domain.model.Drink
-import com.khangle.domain.model.Quote
 import com.khangle.domain.model.Resource
-import com.khangle.domain.repository.GoQuoteRepository
 import com.khangle.domain.repository.TheCockTailDBRepository
 import com.khangle.domain.usecase.GetRandomDrinkUseCase
 import com.khangle.domain.usecase.GetRandomDrinkUseCaseImp
-import com.khangle.domain.usecase.GetRandomQuoteUseCase
-import com.khangle.domain.usecase.GetRandomQuoteUseCaseImp
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.junit.After
@@ -36,7 +34,7 @@ class GetRandomDrinkUseCaseTest {
         //when
         val flow: Flow<Resource<List<Drink>>> = objectUnderTest!!.invoke(true)
         //then
-        verify { cocktailRepository.getRandomDrink(true) }
+        verify(exactly = 1) { cocktailRepository.getRandomDrink(true) }
         Truth.assertThat(flow).isSameInstanceAs(sampleFlow)
     }
 

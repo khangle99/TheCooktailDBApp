@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.khangle.data.webservice.interceptors
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import com.khangle.domain.interceptor.NoConnectivityException
@@ -21,7 +24,8 @@ class NetworkConnectionInterceptor(private val context: Context): Interceptor {
         return chain.proceed(builder.build())
     }
 
-    fun isConnected(): Boolean {
+    @SuppressLint("MissingPermission")
+    private fun isConnected(): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val netInfo = connectivityManager.activeNetworkInfo

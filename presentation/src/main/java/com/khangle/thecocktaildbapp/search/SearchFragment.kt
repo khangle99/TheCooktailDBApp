@@ -2,7 +2,6 @@ package com.khangle.thecocktaildbapp.search
 
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,6 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.*
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.khangle.domain.model.Resource
@@ -24,24 +22,22 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
-
-    private lateinit var binding: FragmentSearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
     private val searchViewModel: SearchViewModel by viewModels()
-    lateinit var adapter: DrinkListAdapter
+    private lateinit var adapter: DrinkListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
     }
 
     @ExperimentalCoroutinesApi
@@ -58,7 +54,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        searchViewModel.drinks.observe(viewLifecycleOwner, Observer {
+        searchViewModel.drinks.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Success -> {
                     binding.searchProgress.root?.visibility = View.GONE
@@ -75,7 +71,11 @@ class SearchFragment : Fragment() {
                 }
 
                 is Resource.Error -> {
-                    binding.searchProgress.root.visibility = View.GONE
+                    if (binding.searchProgress.isInflated) {
+                        binding.searchProgress.root.visibility = View.GONE
+                    } else {
+                        binding.searchProgress.viewStub?.visibility = View.GONE
+                    }
                     binding
                     if (it.throwable is Resources.NotFoundException) {
                         adapter.submitList(emptyList())
@@ -134,6 +134,9 @@ class SearchFragment : Fragment() {
         }
     }
 
-}
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
-private const val TAG = "SearchFragment"
+}

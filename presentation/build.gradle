@@ -48,7 +48,8 @@ android {
 dependencies {
     implementation project(':domain')
     implementation project(':data')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    //noinspection DifferentStdlibGradleVersion
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.4.32"
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
@@ -89,7 +90,7 @@ dependencies {
     // splashy
     implementation 'com.rbddevs.splashy:splashy:1.3.0'
     // unit test
-    testImplementation 'junit:junit:4.+'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation "com.google.truth:truth:1.1.2"
     testImplementation "io.mockk:mockk:1.10.6"
     // Core library

@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.khangle.domain.model.Drink
-import com.khangle.thecocktaildbapp.R
 import com.khangle.thecocktaildbapp.databinding.ItemDrinkBinding
 
 class DrinkListAdapter(private val onClick: (Drink, View) -> Unit) :

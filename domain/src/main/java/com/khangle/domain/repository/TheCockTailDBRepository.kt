@@ -11,4 +11,7 @@ interface TheCockTailDBRepository {
     suspend fun fetchCategoryList(): List<Category>
     suspend fun fetchDrinkByCategory(categoryStr: String): List<FilterResultDrink>
     suspend fun fetchDrinkByAlcoholic(alcoholicStr: String): List<FilterResultDrink>
+    companion object {
+        const val timeout = 60 * 60 * 1000
+    }
 }

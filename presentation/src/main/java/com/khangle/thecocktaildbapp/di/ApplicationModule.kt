@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.khangle.thecocktaildbapp.di
 
 import android.content.Context
@@ -22,6 +24,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -50,6 +53,7 @@ object ApplicationProvideModule {
         val networkInterceptor = NetworkConnectionInterceptor(context)
         return OkHttpClient.Builder()
             .addInterceptor(logging)
+            .addInterceptor(networkInterceptor)
             .connectTimeout(30,TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
@@ -89,6 +93,7 @@ object ApplicationProvideModule {
             .build()
 }
 
+@ExperimentalCoroutinesApi
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ApplicationBindModule {

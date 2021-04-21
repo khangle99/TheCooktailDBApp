@@ -5,23 +5,28 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khangle.domain.model.Category
-import com.khangle.domain.model.Drink
 import com.khangle.domain.model.FilterResultDrink
 import com.khangle.domain.model.Resource
 import com.khangle.domain.usecase.FetchCategoryListUseCase
 import com.khangle.domain.usecase.FetchDrinkByCategoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Error
-import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-class CategoryViewModel @Inject constructor(
+class CategoryViewModel constructor(
+    private val dispatcher: CoroutineDispatcher,
     private val fetchCategoryListUseCase: FetchCategoryListUseCase,
     private val fetchDrinkByCategoryUseCase: FetchDrinkByCategoryUseCase
 ) : ViewModel() {
+    @Inject
+    constructor(
+        fetchCategoryListUseCase: FetchCategoryListUseCase,
+        fetchDrinkByCategoryUseCase: FetchDrinkByCategoryUseCase
+    ) : this(Dispatchers.IO, fetchCategoryListUseCase, fetchDrinkByCategoryUseCase)
+
     private val _categoryList = MutableLiveData<Resource<List<Category>>>()
     val category: LiveData<Resource<List<Category>>> = _categoryList
     private val _drinks = MutableLiveData<Resource<List<FilterResultDrink>>>()
@@ -34,10 +39,10 @@ class CategoryViewModel @Inject constructor(
     }
 
     // avoid reloading when configuration change
-    var fetchCategoryFlag = true // user will change to true in future if need
+    private var fetchCategoryFlag = true // user will change to true in future if need
     fun fetchCategoryList() {
         if (fetchCategoryFlag) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(dispatcher) {
                 try {
                     _categoryList.postValue(Resource.Loading())
                     val categoryList = fetchCategoryListUseCase()
@@ -51,14 +56,14 @@ class CategoryViewModel @Inject constructor(
     }
 
     fun fetchDrinkByCategory(categoryStr: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-           try {
-               _drinks.postValue(Resource.Loading())
-               val drinks = fetchDrinkByCategoryUseCase(categoryStr)
-               _drinks.postValue(Resource.Success(data = drinks))
-           } catch (e: Exception) {
-               _drinks.postValue(Resource.Error(e))
-           }
+        viewModelScope.launch(dispatcher) {
+            try {
+                _drinks.postValue(Resource.Loading())
+                val drinks = fetchDrinkByCategoryUseCase(categoryStr)
+                _drinks.postValue(Resource.Success(data = drinks))
+            } catch (e: Exception) {
+                _drinks.postValue(Resource.Error(e))
+            }
         }
     }
 }

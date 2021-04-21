@@ -7,17 +7,19 @@ import com.khangle.data.webservice.GoQuoteBaseApi
 import com.khangle.domain.model.Quote
 import com.khangle.domain.model.Resource
 import com.khangle.domain.repository.GoQuoteRepository
+import com.khangle.domain.repository.GoQuoteRepository.Companion.timeout
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class GoQuoteRepositoryImp @Inject constructor(
     private val goQuoteBaseApi: GoQuoteBaseApi,
     private val quoteDatabase: QuoteDatabase
 ) : GoQuoteRepository {
     override fun getRandomQuote(forceRefresh: Boolean): Flow<Resource<List<Quote>>> {
         val quoteDao = quoteDatabase.quoteDao()
-        val flow = networkBoundResource(
+        return networkBoundResource(
             query = { quoteDao.getAll() },
             fetch = {
                 goQuoteBaseApi.fetchRandomQuote().quotes[0]
@@ -32,10 +34,11 @@ class GoQuoteRepositoryImp @Inject constructor(
                 if (forceRefresh || it.isEmpty()) {
                     true
                 } else {
-                    System.currentTimeMillis() - it.get(0).createdAt > 60 * 60 * 1000
+                    System.currentTimeMillis() - it[0].createdAt > timeout
                 }
             } // kiem tra timeout
         )
-        return flow
     }
+
+
 }

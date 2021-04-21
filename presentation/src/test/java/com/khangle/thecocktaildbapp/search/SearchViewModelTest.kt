@@ -3,22 +3,20 @@ package com.khangle.thecocktaildbapp.search
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.google.common.truth.Truth.assertThat
+import com.khangle.domain.interceptor.NoConnectivityException
 import com.khangle.domain.model.Drink
 import com.khangle.domain.model.Resource
 import com.khangle.domain.usecase.SearchDrinkByNameUseCase
 import com.khangle.thecocktaildbapp.util.TestCoroutineRule
-import com.khangle.thecocktaildbapp.util.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class SearchViewModelTest {
     var objectUnderTest: SearchViewModel? = null
 
@@ -34,29 +32,56 @@ class SearchViewModelTest {
     @get:Rule
     val testInstantTaskExecutorRule = InstantTaskExecutorRule()
 
+
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        objectUnderTest = SearchViewModel(searchDrinkByNameUseCase)
+        objectUnderTest =
+            SearchViewModel(testCoroutineRule.testCoroutineDispatcher, searchDrinkByNameUseCase)
     }
 
     @Test
-    fun test_query() = runBlocking {
-        testCoroutineRule.runBlockingTest {
-            //given
-            val drink = Drink()
-            val drinkList = listOf(drink)
-            objectUnderTest!!.drinks.observeForever(drinkObserver)
-            every { drinkObserver.onChanged(any()) } answers {}
-            coEvery { searchDrinkByNameUseCase("query") } returns drinkList
-            //when
-            objectUnderTest!!.queryStr("query")
-            //then
-            coVerify { searchDrinkByNameUseCase("query") }
-            assertThat(objectUnderTest!!.drinks.getOrAwaitValue().data).isSameInstanceAs(drinkList)
-            objectUnderTest!!.drinks.removeObserver(drinkObserver)
-        }
+    fun test_query_returnDrinkList() = testCoroutineRule.runBlockingTest {
+        //given
+        val list = mutableListOf<Resource<List<Drink>>>()
+        val drink = Drink()
+        val drinkList = listOf(drink)
+        objectUnderTest!!.drinks.observeForever(drinkObserver)
+        every { drinkObserver.onChanged(capture(list)) } answers {}
+        coEvery { searchDrinkByNameUseCase("query") } returns drinkList
+        //when
+        objectUnderTest!!.queryStr("query")
+        //then
+        coVerify(exactly = 1) { searchDrinkByNameUseCase("query") }
+        verify(exactly = 2) { drinkObserver.onChanged(any()) }
+        assertThat(list[0]).isInstanceOf(Resource.Loading::class.java)
+        assertThat(list[1]).isInstanceOf(Resource.Success::class.java)
+        assertThat(list[1].data).isSameInstanceAs(drinkList)
+        confirmVerified(searchDrinkByNameUseCase, drinkObserver)
+        objectUnderTest!!.drinks.removeObserver(drinkObserver)
     }
+
+
+    @Test
+    fun test_query_throwException() = testCoroutineRule.runBlockingTest {
+        //given
+        val list = mutableListOf<Resource<List<Drink>>>()
+        val exception = NoConnectivityException()
+        objectUnderTest!!.drinks.observeForever(drinkObserver)
+        every { drinkObserver.onChanged(capture(list)) } answers {}
+        coEvery { searchDrinkByNameUseCase("query") } throws exception
+        //when
+        objectUnderTest!!.queryStr("query")
+        //then
+        coVerify(exactly = 1) { searchDrinkByNameUseCase("query") }
+        verify(exactly = 2) { drinkObserver.onChanged(any()) }
+        assertThat(list[0]).isInstanceOf(Resource.Loading::class.java)
+        assertThat(list[1]).isInstanceOf(Resource.Error::class.java)
+        assertThat(list[1].throwable).isInstanceOf(NoConnectivityException::class.java)
+        confirmVerified(searchDrinkByNameUseCase, drinkObserver)
+        objectUnderTest!!.drinks.removeObserver(drinkObserver)
+    }
+
 
     @After
     fun teardown() {

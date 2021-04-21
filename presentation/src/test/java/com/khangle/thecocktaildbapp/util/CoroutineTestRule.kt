@@ -2,19 +2,17 @@ package com.khangle.thecocktaildbapp.util
 
 
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
-import org.junit.After
-import org.junit.Before
 import org.junit.rules.TestRule
-import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
 @ExperimentalCoroutinesApi
 class TestCoroutineRule : TestRule {
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    val testCoroutineDispatcher = TestCoroutineDispatcher()
 
     private val testCoroutineScope = TestCoroutineScope(testCoroutineDispatcher)
 
@@ -32,9 +30,5 @@ class TestCoroutineRule : TestRule {
 
     fun runBlockingTest(block: suspend TestCoroutineScope.() -> Unit) =
         testCoroutineScope.runBlockingTest { block() }
-
-}
-
-class CoroutineTestRule {
 
 }

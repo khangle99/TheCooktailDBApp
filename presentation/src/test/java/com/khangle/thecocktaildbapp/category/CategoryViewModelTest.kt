@@ -2,33 +2,30 @@ package com.khangle.thecocktaildbapp.category
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import com.khangle.domain.interceptor.NoConnectivityException
 import com.khangle.domain.model.Category
-import com.khangle.domain.model.Drink
 import com.khangle.domain.model.FilterResultDrink
 import com.khangle.domain.model.Resource
 import com.khangle.domain.usecase.FetchCategoryListUseCase
 import com.khangle.domain.usecase.FetchDrinkByCategoryUseCase
-import com.khangle.domain.usecase.SearchDrinkByNameUseCase
-import com.khangle.thecocktaildbapp.search.SearchViewModel
 import com.khangle.thecocktaildbapp.util.TestCoroutineRule
-import com.khangle.thecocktaildbapp.util.getOrAwaitValue
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+
+@ExperimentalCoroutinesApi
 class CategoryViewModelTest {
     var objectUnderTest: CategoryViewModel? = null
 
     @MockK
     lateinit var fetchCategoryListUseCase: FetchCategoryListUseCase
+
     @MockK
     lateinit var fetchDrinkByCategoryUseCase: FetchDrinkByCategoryUseCase
 
@@ -47,44 +44,98 @@ class CategoryViewModelTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        objectUnderTest = CategoryViewModel(fetchCategoryListUseCase, fetchDrinkByCategoryUseCase)
+        objectUnderTest = CategoryViewModel(
+            testCoroutineRule.testCoroutineDispatcher,
+            fetchCategoryListUseCase,
+            fetchDrinkByCategoryUseCase
+        )
     }
 
     @Test
-    fun test_fetchCategoryList_returnCategoryList() = runBlocking {
-        testCoroutineRule.runBlockingTest {
-            //given
-           val category = Category("")
-            val categoryList = listOf(category)
-            objectUnderTest!!.category.observeForever(categoryObserver)
-            every { categoryObserver.onChanged(any()) } answers {}
-            coEvery { fetchCategoryListUseCase() } returns categoryList
-            // when
-            objectUnderTest!!.fetchCategoryList()
-            //then
-            coVerify { fetchCategoryListUseCase() }
-            Truth.assertThat(objectUnderTest!!.category.getOrAwaitValue().data).isSameInstanceAs(categoryList)
-            objectUnderTest!!.category.removeObserver(categoryObserver)
-        }
+    fun test_fetchCategoryList_returnCategoryList() = testCoroutineRule.runBlockingTest {
+        //given
+        val categoryCapture = mutableListOf<Resource<List<Category>>>()
+        val category = Category("")
+        val categoryList = listOf(category)
+        objectUnderTest!!.category.observeForever(categoryObserver)
+        every { categoryObserver.onChanged(capture(categoryCapture)) } answers {}
+        coEvery { fetchCategoryListUseCase() } returns categoryList
+        // when
+        objectUnderTest!!.fetchCategoryList()
+        //then
+        coVerify(exactly = 1) { fetchCategoryListUseCase() }
+        verify(exactly = 2) { categoryObserver.onChanged(any()) }
+        assertThat(categoryCapture[0]).isInstanceOf(Resource.Loading::class.java)
+        assertThat(categoryCapture[1]).isInstanceOf(Resource.Success::class.java)
+        assertThat(categoryCapture[1].data).isSameInstanceAs(categoryList)
+        confirmVerified(fetchCategoryListUseCase, categoryObserver)
+        objectUnderTest!!.category.removeObserver(categoryObserver)
     }
 
+
     @Test
-    fun test_fetchDrinkByCategory_returnFilterDrinkList() {
-        testCoroutineRule.runBlockingTest {
-            //given
-            val drink = FilterResultDrink("","","")
-            val drinkList = listOf(drink)
-            objectUnderTest!!.drinks.observeForever(drinkObserver)
-            every { drinkObserver.onChanged(any()) } answers {}
-            coEvery { fetchDrinkByCategoryUseCase("id") } returns drinkList
-            //when
-            objectUnderTest!!.fetchDrinkByCategory("id")
-            // then
-            coVerify { fetchDrinkByCategoryUseCase("id") }
-            Truth.assertThat(objectUnderTest!!.drinks.getOrAwaitValue().data).isSameInstanceAs(drinkList)
-            objectUnderTest!!.drinks.removeObserver(drinkObserver)
-        }
+    fun test_fetchCategoryList_throwException() = testCoroutineRule.runBlockingTest {
+        //given
+        val categoryCapture = mutableListOf<Resource<List<Category>>>()
+        val exception = NoConnectivityException()
+        objectUnderTest!!.category.observeForever(categoryObserver)
+        every { categoryObserver.onChanged(capture(categoryCapture)) } answers {}
+        coEvery { fetchCategoryListUseCase() } throws exception
+        // when
+        objectUnderTest!!.fetchCategoryList()
+        //then
+        coVerify(exactly = 1) { fetchCategoryListUseCase() }
+        verify(exactly = 2) { categoryObserver.onChanged(any()) }
+        assertThat(categoryCapture[0]).isInstanceOf(Resource.Loading::class.java)
+        assertThat(categoryCapture[1]).isInstanceOf(Resource.Error::class.java)
+        assertThat(categoryCapture[1].throwable).isInstanceOf(NoConnectivityException::class.java)
+        confirmVerified(fetchCategoryListUseCase, categoryObserver)
+        objectUnderTest!!.category.removeObserver(categoryObserver)
     }
+
+
+    @Test
+    fun test_fetchDrinkByCategory_returnFilterDrinkList() = testCoroutineRule.runBlockingTest {
+        //given
+        val drinkCapture = mutableListOf<Resource<List<FilterResultDrink>>>()
+        val drink = FilterResultDrink("", "", "")
+        val drinkList = listOf(drink)
+        objectUnderTest!!.drinks.observeForever(drinkObserver)
+        every { drinkObserver.onChanged(capture(drinkCapture)) } answers {}
+        coEvery { fetchDrinkByCategoryUseCase("id") } returns drinkList
+        //when
+        objectUnderTest!!.fetchDrinkByCategory("id")
+        // then
+        coVerify(exactly = 1) { fetchDrinkByCategoryUseCase("id") }
+        verify(exactly = 2) { drinkObserver.onChanged(any()) }
+        assertThat(drinkCapture[0]).isInstanceOf(Resource.Loading::class.java)
+        assertThat(drinkCapture[1]).isInstanceOf(Resource.Success::class.java)
+        assertThat(drinkCapture[1].data).isSameInstanceAs(drinkList)
+        confirmVerified(fetchDrinkByCategoryUseCase, drinkObserver)
+        objectUnderTest!!.drinks.removeObserver(drinkObserver)
+    }
+
+
+    @Test
+    fun test_fetchDrinkByCategory_throwException() = testCoroutineRule.runBlockingTest {
+        //given
+        val drinkCapture = mutableListOf<Resource<List<FilterResultDrink>>>()
+        val exception = NoConnectivityException()
+        objectUnderTest!!.drinks.observeForever(drinkObserver)
+        every { drinkObserver.onChanged(capture(drinkCapture)) } answers {}
+        coEvery { fetchDrinkByCategoryUseCase("id") } throws exception
+        //when
+        objectUnderTest!!.fetchDrinkByCategory("id")
+        // then
+        coVerify(exactly = 1) { fetchDrinkByCategoryUseCase("id") }
+        verify(exactly = 2) { drinkObserver.onChanged(any()) }
+        assertThat(drinkCapture[0]).isInstanceOf(Resource.Loading::class.java)
+        assertThat(drinkCapture[1]).isInstanceOf(Resource.Error::class.java)
+        assertThat(drinkCapture[1].throwable).isInstanceOf(NoConnectivityException::class.java)
+        confirmVerified(fetchDrinkByCategoryUseCase, drinkObserver)
+        objectUnderTest!!.drinks.removeObserver(drinkObserver)
+    }
+
 
     @After
     fun teardown() {

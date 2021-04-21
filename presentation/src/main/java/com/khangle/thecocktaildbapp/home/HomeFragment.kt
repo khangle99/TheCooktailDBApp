@@ -1,20 +1,16 @@
 package com.khangle.thecocktaildbapp.home
 
 import android.os.Bundle
-import android.os.Handler
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.khangle.domain.model.Resource
 import com.khangle.thecocktaildbapp.R
 import com.khangle.thecocktaildbapp.alcoholic.AlcoholicFilterFragment
@@ -23,15 +19,18 @@ import com.khangle.thecocktaildbapp.cocktailDetail.CockTailDetailFragment
 import com.khangle.thecocktaildbapp.databinding.FragmentHomeBinding
 import com.khangle.thecocktaildbapp.extensions.commitAnimate
 import com.khangle.thecocktaildbapp.search.SearchFragment
-import com.rbddevs.splashy.Splashy
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@ExperimentalCoroutinesApi
+@FlowPreview
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private val homeViewModel: HomeViewModel by viewModels()
-    private lateinit var binding: FragmentHomeBinding
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
-        setSlashy()
         super.onCreate(savedInstanceState)
         homeViewModel.refresh()
     }
@@ -40,7 +39,8 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -95,7 +95,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeLiveData() {
-        homeViewModel.randomDrink.observe(viewLifecycleOwner, Observer {
+        homeViewModel.randomDrink.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Success -> {
                     binding.drink = it.data?.get(0)
@@ -112,7 +112,7 @@ class HomeFragment : Fragment() {
             }
         })
 
-        homeViewModel.randomQuote.observe(viewLifecycleOwner, Observer {
+        homeViewModel.randomQuote.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Success -> {
                     binding.quote = it.data?.get(0)
@@ -127,20 +127,8 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun setSlashy() {
-        Splashy(requireActivity())
-            .setLogo(R.drawable.ic_app)
-            .setTitle("Cocktail")
-            .setTitleSize(30.0f)
-            .setTitleColor("#FFFFFF")
-            .setBackgroundColor(R.color.backgroundSplash)
-            .setSubTitle("The Cocktail DB App")
-            .setSubTitleColor(R.color.textOnSplash)
-            .setSubTitleItalic(true)
-            .setProgressColor(R.color.white)
-            .setAnimation(Splashy.Animation.SLIDE_IN_TOP_BOTTOM, 1000)
-            .setFullScreen(true)
-            .setDuration(2000)
-            .show()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

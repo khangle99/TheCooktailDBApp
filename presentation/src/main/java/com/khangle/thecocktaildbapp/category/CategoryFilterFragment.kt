@@ -1,7 +1,6 @@
 package com.khangle.thecocktaildbapp.category
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +9,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.asksira.dropdownview.OnDropDownSelectionListener
 import com.khangle.domain.model.Drink
@@ -25,7 +24,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class CategoryFilterFragment : Fragment() {
-    private lateinit var binding: FragmentCategoryFilterBinding
+    private var _binding: FragmentCategoryFilterBinding? = null
+    private val binding get() = _binding!!
     private val categoryViewModel: CategoryViewModel by viewModels()
     private lateinit var adapter: DrinkListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +37,9 @@ class CategoryFilterFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding =
+        _binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_category_filter, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -55,7 +56,7 @@ class CategoryFilterFragment : Fragment() {
 
     private fun setEvent() {
         binding.dropdownview.onSelectionListener =
-            OnDropDownSelectionListener { dropDownView, position ->
+            OnDropDownSelectionListener { _, position ->
                 categoryViewModel.selecteCategory(position)
             }
     }
@@ -88,11 +89,11 @@ class CategoryFilterFragment : Fragment() {
         categoryViewModel.selectedCategory.observe(viewLifecycleOwner, {
             categoryViewModel.fetchDrinkByCategory(it)
         })
-        categoryViewModel.category.observe(viewLifecycleOwner, {
-            when (it) {
+        categoryViewModel.category.observe(viewLifecycleOwner, { resource ->
+            when (resource) {
                 is Resource.Success -> {
                     binding.dropdownview.dropDownItemList =
-                        it.data?.map { it.strCategory } ?: emptyList()
+                        resource.data?.map { it.strCategory } ?: emptyList()
                     binding.categoryProgressBar.root?.isVisible = false
                     binding.dropdownview.isVisible = true
                 }
@@ -132,5 +133,10 @@ class CategoryFilterFragment : Fragment() {
                 }
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -5,22 +5,28 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.khangle.domain.model.Alcoholic
-import com.khangle.domain.model.Category
 import com.khangle.domain.model.FilterResultDrink
 import com.khangle.domain.model.Resource
 import com.khangle.domain.usecase.FetchAlcoholicListUseCase
 import com.khangle.domain.usecase.FetchDrinkByAlcoholicUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-class AlcoholicViewModel @Inject constructor(
+class AlcoholicViewModel constructor(
+    private val dispatcher: CoroutineDispatcher,
     private val fetchAlcoholicListUseCase: FetchAlcoholicListUseCase,
     private val fetchDrinkByAlcoholicUseCase: FetchDrinkByAlcoholicUseCase
-): ViewModel() {
+) : ViewModel() {
+    @Inject
+    constructor(
+        fetchAlcoholicListUseCase: FetchAlcoholicListUseCase,
+        fetchDrinkByAlcoholicUseCase: FetchDrinkByAlcoholicUseCase
+    ) : this(Dispatchers.IO, fetchAlcoholicListUseCase, fetchDrinkByAlcoholicUseCase)
+
     private val _alcoholicList = MutableLiveData<Resource<List<Alcoholic>>>()
     val alcoholicList: LiveData<Resource<List<Alcoholic>>> = _alcoholicList
     private val _drinks = MutableLiveData<Resource<List<FilterResultDrink>>>()
@@ -32,10 +38,10 @@ class AlcoholicViewModel @Inject constructor(
     }
 
     // avoid reloading when configuration change
-    var fetchALcoholicFlag = true // user will change to true in future
+    private var fetchALcoholicFlag = true // user will change to true in future
     fun fetchAlcoholicList() {
         if (fetchALcoholicFlag) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(dispatcher) {
                 try {
                     _alcoholicList.postValue(Resource.Loading())
                     val alcoholicList = fetchAlcoholicListUseCase()
@@ -49,7 +55,7 @@ class AlcoholicViewModel @Inject constructor(
     }
 
     fun fetchDrinkByAlcoholic(alcoholicStr: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcher) {
             try {
                 _drinks.postValue(Resource.Loading())
                 val drinks = fetchDrinkByAlcoholicUseCase(alcoholicStr)
